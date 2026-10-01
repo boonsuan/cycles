@@ -1,0 +1,931 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}\newtheorem*{remark}{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\NN}{\mathcal N}
+\newcommand{\Own}{\mathsf O}
+\newcommand{\Lost}{\mathsf L}
+\DeclareMathOperator{\dist}{dist}
+\title{A shorter route to the Erd\H{o}s--Gallai conjecture}
+\author{Working reconstruction of the proof claim by Ryan Coffey}
+\date{1 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We give a substantially shorter reconstruction of the claimed proof: one
+kind of expander piece, one retirement argument, elementary grouping of
+two-edge paths, and a small quotient. A bounded-degree auxiliary graph
+replaces the long case distinction in the random linking argument.
+The main external combinatorial inputs are Haxell's matching theorem
+and the Lov\'asz path decomposition corollary.
+This is a new mathematical draft, checked by static reasoning but not
+formally verified. It is not a transcription of the submitted Lean proof.
+\end{abstract}
+
+\section{The idea}
+Write $f(G)$ for the least number of simple cycles and single edges whose
+edge sets partition $E(G)$. All graphs are finite and simple, all logarithms
+are base two, and all implicit constants are absolute.
+
+\begin{theorem}\label{thm:main}
+There is an absolute constant $C$ such that $f(G)\le C|V(G)|$.
+\end{theorem}
+
+The useful target is a reduction, rather than a decomposition in one step:
+\begin{equation}\label{eq:reduction}
+ f(G)\le C_0 n+2\sum_i f(Q_i),\qquad
+ \sum_i|V(Q_i)|\le n/4.
+\end{equation}
+The $Q_i$ are simple graphs. Induction then proves the theorem with
+$C=2C_0$. The factor two only pays for quotient edges representing paths
+of two original edges.
+
+We repeatedly extract robust expanders, with the average degree of the
+remaining graph falling from $d$ to a fixed power of $\log d$. A vertex
+is new in at most two rounds. Vertices shared between pieces have small
+total incidence. These are the vertices we pay to remove locally.
+Every other vertex can use an expander from at least two rounds earlier
+as a reservoir of connecting edges.
+
+Most remaining edges close into cycles by a particularly simple rule:
+pair edges into two-edge paths, group vertex-disjoint paths greedily,
+and connect each group cyclically. The unpaired edges have at most one
+edge at each pair consisting of a shared vertex and an earlier piece.
+This property lets us move their endpoints into tiny random pools and
+obtain the graphs $Q_i$ in \eqref{eq:reduction}.
+
+The order matters. We build the hierarchy forwards, but use its pieces
+backwards. A reservoir is lent before its owner is decomposed. Only edges
+actually used by the borrower are removed from the owner's graph.
+
+\section{Expansion and sparse linking}
+An $N$-vertex graph is \emph{$(\eps,s)$-robust} if
+\[
+ |\NN_{G-F}(U)|\ge \frac{\eps|U|}{\log^2 N}
+ \quad\text{whenever }1\le |U|\le 2N/3,\quad |F|\le s|U|.
+\]
+Here $\NN$ is the external neighbourhood. Graphs of order at most one
+are treated as terminal pieces. In the hierarchy $\eps=1/32$.
+
+We use the following corollary of Lov\'asz's theorem, as stated in
+\cite[Corollary 22]{BM}: every graph has a decomposition into simple
+paths with each vertex an endpoint at most twice.
+We also use Haxell's theorem \cite{Haxell} in this form: families
+$\mathcal H_i$ of sets of size at most $h$ have pairwise disjoint
+representatives if, for every nonempty index set $I$ and every set $F$
+with $|F|\le(2h-1)(|I|-1)$, some member of some $\mathcal H_i$, $i\in I$,
+avoids $F$. Chernoff and martingale Bernstein inequalities are used below.
+
+\begin{lemma}[Edge splitting]\label{lem:split}
+Suppose edges of an $(\eps,s)$-robust $N$-vertex graph independently
+receive labels, each specified label having probability $p$.
+If $ps\ge C\log N$, its label graph is $(\eps,ps/2)$-robust with
+failure probability at most $N^{-6}$. The constant $C$ can be increased
+to give any fixed polynomial failure bound.
+\end{lemma}
+\begin{proof}
+For a set $U$ of size $u\le2N/3$ and an external set $T$ of size
+$|T|<\eps u/\log^2N$, robustness forces more than $su$ edges from $U$
+to $V\setminus(U\cup T)$. Chernoff bounds the probability that at most
+$psu/2$ have the label by $\exp(-psu/8)$. There are at most $N^{3u}$
+choices of $(U,T)$, up to an inessential constant. Sum over $u$.
+Failure of the desired robustness supplies exactly such a pair.
+\end{proof}
+
+The following is the main analytic simplification. Its proof is included
+so that no source-specific linking theorem is left as a black box.
+
+\begin{lemma}[Sparse linking]\label{lem:link}
+Fix $\eps_0>0$. There are constants $C,N_0$ depending only on $\eps_0$
+with the following property. Let $G$ be $(\eps,s)$-robust on $N\ge N_0$
+vertices, where $\eps_0\le\eps\le1$. Put $L=\log N$. If
+\[
+ 0<\rho\le\tfrac12,\qquad t\ge1,\qquad
+ s\ge CtL^{18}\rho^{-3},
+\]
+then a $\rho$-random vertex set $V$ has, with probability at least
+$1-N^{-3}$, this property: every multiset of pairs of distinct vertices,
+with each vertex occurring at most $t$ times, can be joined by
+edge-disjoint paths of length $O(L^4)$ whose interiors lie in $V$.
+The pairs may be chosen after $V$.
+\end{lemma}
+\begin{proof}
+Put $\alpha=\eps/L^2$. A ball $\mathcal B_G^a(U;V)$ through $V$
+counts endpoints in $V$ reachable from $U$ by paths of length at most
+$a$ whose interiors lie in $V$; starting vertices are unrestricted,
+and zero-length paths are allowed.
+
+\emph{A short certificate for random growth.}
+Let $1\le|W|\le2N/3$, $|F|\le s|W|/4$, and $1\le d\le s$ be an
+integer. Take a maximal bipartite subgraph $H$ of $G-F$ across
+$(W,V(G)\setminus W)$ with degree at most $d$ on both sides. Then
+\begin{equation}\label{eq:certificate}
+ e(H)\ge\alpha d|W|/4.
+\end{equation}
+Indeed, otherwise the sets $S\subseteq W$ and $X\subseteq V(G)\setminus W$
+of saturated vertices each have size less than $\alpha|W|/4$.
+For $U=W\setminus S$, maximality gives
+$\NN_{G-F-H}(U)\subseteq S\cup X$. But $|U|\ge3|W|/4$ and
+$|F\cup E(H)|\le s|W|/2\le s|U|$, contradicting expansion.
+
+Sample vertices of $W$ independently with probability $p$, and take
+$d=\lceil1/p\rceil\le s$. Let $Z$ count their $H$-neighbours outside $W$.
+Since $pr\le2$ for every right degree $r$, we have
+\[
+ \mu:=\E Z\ge pe(H)/3\ge\alpha|W|/12.
+\]
+Expose the independent vertex bits. The resulting Doob martingale has
+increments bounded by $d$ and conditional variance sum at most
+\[
+ \beta=\sum_{w\in W}p(1-p)\deg_H(w)^2
+ \le pd e(H)\le3d\mu.
+\]
+Bernstein, with deviation $\mu/2$, therefore gives
+\begin{equation}\label{eq:growth}
+ \Prob(Z<\alpha|W|/24)\le\exp(-\alpha p|W|/624).
+\end{equation}
+No independence among the right-side coverage events is needed.
+
+\emph{Sprinkling.}
+For this paragraph suppose the robustness parameter is at least
+$\theta+1$, where
+\[
+ \ell=\lceil100L/\alpha\rceil,\qquad p=\rho/(10\ell),\qquad
+ \theta=C_1L/(\alpha p),\qquad \mu_0=\alpha/(6\theta).
+\]
+Thus $\ell=O(L^3)$, $\theta=O(L^6/\rho)$ and
+$\mu_0^{-1}=O(L^8/\rho)$.
+Call $A$ well-expanding if $|\NN_G(A)|\ge\theta|A|$.
+For fixed such $A$, $a=|A|>0$, and $|F|\le a$, expose $\ell-1$
+independent $p$-random batches followed by one independent $q$-random
+batch, chosen so their union has density exactly $\rho$.
+The earlier union has density at most $\rho/10$, so $q\ge0.9\rho$.
+
+Let $B_i$ be the vertices reachable from $A$ by paths of length at most
+$i$, with interiors in the first $i-1$ batches and unrestricted endpoints;
+include zero-length paths. Initially $|B_1|\ge\theta a$.
+Conditional on the past, \eqref{eq:growth} shows that, while
+$|B_i|\le2N/3$, the next batch increases it by at least
+$\alpha|B_i|/24$, except with probability
+$\exp(-\alpha p\theta a/624)$.
+All hypotheses hold since $|F|\le a$ and the robustness is at least
+$\theta+1$. Choosing $C_1$ large makes the total failure at most
+$N^{-11a}$. The $\ell-1$ growth steps suffice to pass $2N/3$.
+The last batch then contributes more than $0.56\rho N$ reachable
+vertices, while the full union has fewer than $1.1\rho N$, except with
+probability $\exp(-c\rho N)$. Since $\theta a\le N$ and
+$\rho\theta\gg C_1L$, this is at most $N^{-11a}$.
+Consequently the ball of radius $\ell$ from $A$, restricted to endpoints
+in $V$, has size greater than $|V|/2$, with failure at most $N^{-10a}$.
+
+Every $U$ with $1\le|U|\le2N/3$ contains a well-expanding
+$A$ of size at least $\alpha|U|/(3\theta)$.
+Take an inclusion-maximal well-expanding $A\subseteq U$. If $A=U$, this is immediate.
+Otherwise every $u\in U\setminus A$ has fewer than $\theta+1$
+neighbours outside $A\cup\NN(A)$. Delete these edges. Expansion gives
+$\alpha|U|\le|\NN(A)|$, so $A\ne\varnothing$; maximality also gives
+$|\NN(A)|<\theta(|A|+1)+1\le3\theta|A|$.
+This proves the assertion, including $A\ne\varnothing$.
+
+A union bound over the $O(N^{3a})$ choices of $(A,F)$ with
+$|A|=a$, $|F|\le a$, now gives the following event with failure at most
+$N^{-6}$:
+\begin{equation}\label{eq:balls}
+ |\mathcal B_{G-F}^{\ell}(U;V)|>|V|/2
+ \quad\text{for all }U\ne\varnothing,\ |F|\le\mu_0|U|.
+\end{equation}
+For $|U|>2N/3$, use a subset of size between $N/2$ and $2N/3$;
+the factor six in $\mu_0$ covers this case.
+
+\emph{From balls to paths.}
+Here is a useful elementary observation from the argument of \cite{BM}.
+Suppose every $u$-vertex set reaches more than half of $V$ in radius
+$\ell$ and $|V|\ge4u-2$. At most $u-1$ vertices can have a ball of
+radius $2\ell L$ of size at most $|V|/2$. Otherwise start with a
+$u$-set of such vertices. Split it into two almost equal sets; one
+half's current ball contains at least $u$ vertices, since the union
+contains more than $|V|/2\ge2u-1$. Expanding those $u$ vertices by
+another $\ell$ steps restores a ball larger than half of $V$.
+Repeat while the starting set has size at least two, until a singleton
+remains, in at most $\lceil\log u\rceil$ steps. Its final radius is at most
+$(1+\lceil\log u\rceil)\ell\le2\ell L$ for $N\ge4$.
+This contradicts the choice of the singleton; $u=1$ is immediate. Concatenation is
+legitimate because the intermediate ball vertices belong to $V$.
+It follows that among $2u-1$ disjoint pairs some pair has a joining
+path through $V$ of length at most $h=\lceil4\ell L\rceil$.
+
+Suppose \eqref{eq:balls} holds with deletion allowance
+$\bar s|U|$, where $\bar s=40ht/\rho$, and $|V|\ge\rho N/2$.
+For a nonempty submultiset $I$ of demands, choose a maximal collection
+of vertex-disjoint pairs, of size $q$; then $|I|\le2tq$.
+Put $M=\lceil4/\rho\rceil$ and $u=\lceil q/(2M)\rceil$.
+We have $2u-1\le q$ and, since $q\le N/2$,
+$4u-2\le N/M+2\le\rho N/2\le|V|$ when $\rho N\ge8$.
+Any forbidden edge set satisfying Haxell's threshold obeys
+\[
+ |F|\le(2h-1)(|I|-1)<2h|I|\le4htq\le40htu/\rho.
+\]
+The observation supplies a path avoiding $F$ for one of these pairs.
+Apply Haxell to the edge sets of the length-at-most-$h$ joining paths.
+This gives all the desired edge-disjoint paths, including repeated demands.
+
+\emph{Amplification.}
+Set $K=\lceil\bar s/\mu_0\rceil=O(tL^{12}\rho^{-2})$ and split the
+edges uniformly into $K$ colours. Lemma~\ref{lem:split}, with a stronger
+fixed polynomial tail if needed, gives robustness $s/(2K)\ge\theta+1$
+in every colour. Apply \eqref{eq:balls} in each colour, using the same
+independent set $V$. Given $|F|\le\bar s|U|$, some colour contains at
+most $\mu_0|U|$ edges of $F$, so its large ball proves the amplified
+property for $G-F$. It suffices that
+$s\ge2K(\theta+1)=O(tL^{18}\rho^{-3})$.
+Feasibility gives $N>s$, hence $K<N$ and $\rho N\gg\log N$.
+The splitting failure, $KN^{-6}$, and the Chernoff failure for
+$|V|\ge\rho N/2$ total at most $N^{-3}$ for large $N$.
+The auxiliary colouring merely witnesses a property of $(G,V)$, so it
+can be discarded. This proves the uniform assertion of the lemma.
+\end{proof}
+
+\section{A hierarchy with only one kind of piece}
+Fix a sufficiently large absolute cutoff $D$. Keep the original $n$
+vertices throughout. In a round with residual average degree $d\ge D$, put
+\begin{equation}\label{eq:scales}
+ \lambda=\log d,\quad M=\lceil d^2\rceil,\quad
+ s=\lceil\lambda^{100}\rceil,\quad P=\lceil\lambda^{103}\rceil,
+ \quad\tau=\lceil2^{14}\lambda^{102}\rceil.
+\end{equation}
+The exponents provide slack; their numerical values are not significant.
+
+\emph{The splitting rule.}
+If a graph $H$ of order $m$ is not $(\eps,s)$-robust, take a witness
+$U,F$, put $N=\NN_{H-F}(U)$ and
+$F_0=E_H(U,V(H)\setminus(U\cup N))$.
+Move the vertices of $U$ with $F_0$-degree at least $\tau$ to $N$;
+call the remaining set $A$. Then also move to $N$ every vertex outside
+$U\cup N$ with at least $\tau$ neighbours in $A$.
+Call the resulting separator $B$, and delete the edges
+$F''=E_H(A,V(H)\setminus(A\cup B))$.
+The children are
+\[
+ H[A\cup B],\qquad H[V(H)\setminus A]-E_H(B).
+\]
+Their edge sets and $F''$ partition $E(H)$; their vertex intersection is $B$.
+If $\tau\ge256s\log^2m_0$, where $m_0$ is the root order, then
+\begin{equation}\label{eq:splitshape}
+ |B|\le\frac{2\eps|A|}{\log^2m},\quad
+ 0<|A|,\quad |A\cup B|<3m/4,\quad |F''|\le2s|A|.
+\end{equation}
+Indeed the edges charged to the two kinds of moved vertices are disjoint
+subsets of $F_0$. Their total number of vertices is at most
+$s|U|/\tau\le\eps|U|/(8\log^2m)$; combine this with the witness bound
+on $N$. Both children are smaller, so recursion terminates. For $s=0$
+there are no deletions or moved vertices and the same shape bounds hold.
+
+\emph{Overlap and thin cuts.}
+In any such splitting tree let $S$ be the sum of leaf orders and
+$\Delta$ the sum of separator sizes. Exact counting gives $S=n+\Delta$.
+At a split of order $m$, charge $2\eps/\log^2m$ for each $u\in A$
+to a leaf copy of $u$ below the first child. Along the nodes charging
+one copy, orders grow by a factor at least $4/3$. Hence separators at
+nodes of order at least $T\ge2$ have total size at most
+\[
+ 2\eps S\sum_{j\ge0}(\log T+j\log(4/3))^{-2}
+ <\frac{7\eps S}{\log T}.
+\]
+Taking $T=2$ and $\eps=1/32$ gives
+\begin{equation}\label{eq:overlap}
+ S<4n/3,\qquad \Delta_{\ge T}<n/\log T.
+\end{equation}
+The same charging, with charge $2s$ instead, bounds all deleted edges
+in a root of order $m_0$ by $10sm_0\log m_0$.
+
+For a leaf $Y$, let $Y^\circ$ be its vertices occurring in no other leaf.
+Fewer than $\tau$ deleted edges join any given vertex $h$ to $Y^\circ$.
+If $h\in Y$, none do. Otherwise all these edges are cut at the last
+node on the path to $Y$ containing $h$. There $h$ is on the opposite
+exclusive side from $Y^\circ$, and the rule moving high-degree vertices
+gives the bound. This also holds for a composite tree whose initial
+splits have $s=0$, since those delete no edges.
+
+\emph{A short long-cycle argument.}
+An $(\eps,0)$-robust graph of sufficiently large order $N$ has a cycle
+of length at least $\eps N/(8\log^2N)$. It is connected, since a
+smallest component would otherwise contradict expansion.
+Run depth-first search and put $k=\lfloor N/2\rfloor$. Choose a deepest
+vertex $v$ whose subtree has more than $k$ vertices. Its child subtrees
+have size at most $k$ and total size at least $k$. Choose a union $U$
+of these subtrees with $k/2\le|U|\le k$: take one large enough child,
+or combine smaller children greedily. Undirected depth-first search
+has no cross edges, so every external neighbour of $U$ lies on the
+root-to-$v$ path. There are $q\ge\eps k/(2\log^2N)$ such neighbours.
+If $x$ is the highest one and $xu$ an edge to $U$, the tree path from
+$x$ to $u$, followed by $ux$, is a cycle of length at least $q+1$.
+For sufficiently large $N$, $q\ge2$, so this is a genuine cycle.
+
+\emph{One round.}
+First remove cycles of length at least $d\lambda^2$ until none remains.
+Split the rest with $s=0$ into weak expanders. The preceding argument
+bounds every resulting piece by $M$: otherwise, for large $D$,
+\[
+ c\frac{d^2}{\log^2(d^2)}>d\log^2d
+\]
+contradicts the absence of long cycles (use monotonicity of
+$x/\log^2x$ for large $x$). Split each weak piece of order at least $P$
+again with the $s,\tau$ in \eqref{eq:scales}, stopping also at order $<P$.
+The condition for \eqref{eq:splitshape} holds since
+$256s\log^2M\le4608\lambda^{102}<\tau$.
+The weak and robust stages form one composite splitting tree, so its
+total leaf order is still less than $4n/3$.
+Every large terminal leaf $Y$ has a robust spanning graph $H_Y$;
+we retain the full vertex set of every such leaf.
+
+First assign all edges of $H_Y$ to their own leaf. Then assign every
+still unassigned edge having both ends in any retained leaf to one such
+leaf, using a fixed rule. Denote the assigned set by $E_r(Y)$.
+Pass all remaining edges to the next round. This assignment implies
+\begin{equation}\label{eq:separation}
+ H_Y\subseteq E_r(Y),\qquad
+ \text{no later edge has both ends in }Y.
+\end{equation}
+All assigned sets, and consequently all reservoirs $H_Y$, are
+edge-disjoint over the entire hierarchy.
+
+Only cut edges and edges in leaves of order $<P$ can remain. By
+\eqref{eq:overlap} and the deleted-edge bound their average degree satisfies
+\begin{equation}\label{eq:recursion}
+ d_{r+1}\le160\lambda_r^{101}+\tfrac43P_r\le\lambda_r^{105}.
+\end{equation}
+Stop below $D$. The final residual costs at most $Dn/2$ single edges.
+Round $r$ removes at most $n/(2\lambda_r^2)$ long cycles.
+
+\emph{The only scale estimates needed.}
+After increasing $D$, the sequences $M_r$, $\lambda_r$ and
+$\mu_r:=\log\lambda_r$ each decrease by a factor at least two.
+For $l\ge3$, putting $x=\lambda_{l-2}$ gives
+\begin{equation}\label{eq:tworound}
+ M_l\le2(105\log x)^{210}.
+\end{equation}
+Thus $M_l^a=o(x^b)$ for every fixed $a,b>0$, uniformly in $l$.
+If $R$ is the last active round, the elementary estimate
+\begin{equation}\label{eq:sums}
+ \sum_r\frac{(R-r+1)^k}{\mu_r^a}
+ \le\frac{\sum_{j\ge0}(j+1)^k2^{-aj}}{(\log\log D)^a}
+\end{equation}
+holds for fixed $a>0,k\ge0$. The analogous estimate holds with $\lambda$;
+also $\sum_r M_r^{-a}\le2D^{-2a}$ for $a\ge1$.
+These replace all iterated-logarithm and tower bookkeeping.
+
+\emph{Roles and concentration.}
+Let $A_r$ be the vertices lying in at least two retained leaves in round
+$r$. Call them hubs. All other vertices of a retained leaf are unique
+ports. A unique port in round $l$ is fresh if it lies in no retained
+leaf from a round $r\le l-2$. Otherwise fix one such leaf $Y(u)$ as
+its class, before any randomness. A vertex can be fresh only at its
+first appearance and in the following round, so
+\begin{equation}\label{eq:fresh}
+ \sum_l|\mathrm{Fresh}_l|\le2n.
+\end{equation}
+Let $\mathrm{Dup}_r$ denote vertices duplicated anywhere in the full
+splitting tree. A duplicated vertex in a retained leaf has been
+duplicated at a node of order at least $P_r$. If it occurs in $c$
+retained leaves, then $c\le2k$, where $k\ge1$ is its number of such
+duplications. Consequently
+\begin{equation}\label{eq:hub}
+ \sum_Y|Y\cap\mathrm{Dup}_r|\le2n/\log P_r,
+ \qquad \sum_{r,Y}|Y\cap A_r|=o_D(n).
+\end{equation}
+Here and below $o_D(n)$ means $\eta(D)n$ for an absolute function
+$\eta(D)\to0$, uniformly in the graph and its number of rounds.
+
+Let $m_{Y,l}$ be the maximum, over vertices $h$, of the number of
+round-$l$ assigned edges $hu$ with $Y(u)=Y$, where $Y$ is from round $r$.
+By \eqref{eq:separation}, $h\notin Y$. Ports outside $\mathrm{Dup}_r$
+give cut edges of the round-$r$ tree and hence contribute fewer than
+$\tau_r$ at $h$. The others contribute at most their number.
+There are at most $2n/P_r$ retained leaves at round $r$, so
+\begin{align}\label{eq:concentration}
+ \sum_{Y,l}m_{Y,l}
+ &\le2n\sum_r(R-r)\left(\frac{\tau_r}{P_r}
+                         +\frac1{\log P_r}\right)=o_D(n).
+\end{align}
+We used $\tau_r/P_r=O(1/\lambda_r)$ and \eqref{eq:sums}.
+Finally, if $\nu_l$ is the number of available classes at round $l$,
+\begin{equation}\label{eq:ancestors}
+ \nu_l\le4n/P_{l-2},\qquad
+ \sum_{l\ge3}\nu_l M_l^a=o_D(n)\quad\text{for every fixed }a>0.
+\end{equation}
+
+\section{Retiring an arbitrary set of vertices}
+\begin{lemma}[Retirement]\label{lem:retire}
+There are absolute constants $C,N_0$ such that the following holds.
+Let $O$ be an $(\eps,s)$-robust spanning graph on a set $Z$ of order
+$N\ge N_0$, with $1/32\le\eps\le1$ and $s\ge C\log^{42}N$.
+For every graph $E$ containing $O$ on $Z$, and every $P\subseteq Z$,
+one can cover all edges of $E[P]$, together with some other edges of $O$,
+by at most $200|P|$ edge-disjoint cycles and single edges.
+Every remaining edge of $E$ has an endpoint outside $P$.
+\end{lemma}
+\begin{proof}
+The case $P=\varnothing$ is immediate. Put $L=\log N$ and $m=\lceil L^6\rceil$.
+First choose $m$ distinct neighbours $A(w)$ of each vertex $w$ in $O$,
+so that every vertex belongs to at most
+$b=\lceil2mL^2/\eps\rceil=O(L^8)$ of these sets.
+Here is a Hall proof that respects distinctness. On the left put each
+oriented edge $(w,u)$. On the right put $b$ load slots at $u$ and
+$\deg_O(w)-m$ spare slots at $w$, joining $(w,u)$ to these slots.
+For any collection of oriented edges, let $R$ be its second coordinates
+and $S'$ the first coordinates whose demands exceed their spare slots.
+Each excess is at most $m$, and such a $w$ has at most $m-1$ neighbours
+outside $R$. If $S'=\varnothing$, Hall is immediate. Otherwise choose
+$U\subseteq S'$ with $|S'|/2\le|U|\le2N/3$.
+Delete its edges to outside $R$, using at most $(m-1)|U|$ deletions.
+Expansion gives $|R|\ge\eps|S'|/(2L^2)$, so $b|R|\ge m|S'|$ pays
+all excesses. Hall now matches all oriented edges. At least $m$ edges
+out of each $w$ use load slots; choose any $m$ of their distinct heads.
+
+Let $J=\lfloor\log(L/6)\rfloor$, so $6/L\le2^{-J}<12/L$.
+Split $O$ randomly into $2J+1$ graphs: a reserve $M$ and connectors
+$R_{j,c}$, $0\le j<J$, $c=1,2$.
+Independently, let each $p\in P$ survive to level $j$ with probability
+$2^{-j}$, in nested levels; vertices outside $P$ survive always.
+Give every vertex an independent label $0,1,2$ with probabilities
+$1/2,1/4,1/4$. Let $U_j$ be the survivors,
+$P_j=P\cap U_j$, $W_j=P_j\setminus P_{j+1}$, and
+\[
+ Z_j=U_{j+1}\cap\{\text{label }0\},\qquad
+ V_{j,c}=U_{j+1}\cap\{\text{label }c\}.
+\]
+We can fix an outcome with the following properties: each $R_{j,c}$
+links every pair multiset of multiplicity at most $b+2$ through
+$V_{j,c}$; each $w\in P$ has four reserve edges into $A(w)\cap Z_j$
+for every $j<J$; and
+\begin{equation}\label{eq:retire-sum}
+ \sum_{j<J}|P_j|\le8|P|,\qquad |P_J|\le48|P|/L.
+\end{equation}
+To see existence, edge splitting gives robustness at least
+$s/(2(2J+1))$ in every connector. Each vertex belongs independently
+to $V_{j,c}$ with probability at least $1/L$; apply
+Lemma~\ref{lem:link} by thinning, with $t=b+2=O(L^8)$.
+The lemma requires only $O(L^{29})$ robustness; the assumed $CL^{42}$
+is ample. All connector failures have total probability $o(1)$.
+For each reserve requirement the expected number of candidates is at
+least $3L^4$, with independent indicators, so Chernoff and a union bound
+over $NJ$ requirements also give failure $o(1)$.
+Each inequality in \eqref{eq:retire-sum} fails with probability at most
+$1/4$, by Markov. Thus all events hold simultaneously for large $N$.
+
+Process $W_0,W_1,\ldots,W_{J-1}$. At step $j$, the unused edges of
+$E[P]$ are supported on $P_j$. Let $F_j$ be those meeting $W_j$.
+At each $w\in W_j$ reserve four edges into $A(w)\cap Z_j$, two for
+each phase $c=1,2$, and remove these from $F_j$ if present.
+Give each remaining edge of $F_j$ a phase whose $V_{j,c}$ avoids both
+its ends. This is possible: one end is in $W_j$, and there is at most
+one other end in $U_{j+1}$.
+
+Decompose each phase into at most $|P_j|$ paths, with each vertex an
+endpoint at most twice, using the published path corollary.
+At an endpoint in $W_j$ append a distinct phase-reserved edge.
+Output unused reserve edges singly. Each extended path avoids
+$V_{j,c}$ and has both endpoints in $U_{j+1}$.
+Only its two appended endpoints can repeat interior vertices. Excising
+these repetitions gives at most two simple cycles and one simple path
+with the original endpoints. If these endpoints coincide, only cycles
+remain. Any residual path has length at least two: every edge meets
+$W_j$, whereas its endpoints avoid $W_j$.
+
+The residual paths have endpoint multiplicity at most $b+2$.
+There are at most two inherited endpoints at a vertex; all new ones
+come from distinct reserved edges $wx$ with $x\in A(w)$, and there
+are at most $b$ such $w$. Connect each residual path's ends through
+$V_{j,c}$. It avoids its connector's interior, so their union is a
+simple cycle. Connectors within a phase are edge-disjoint; colours
+separate the two phases.
+
+No edge is spent twice. Earlier steps use only edges meeting their own
+$W_i$ or belonging to their own connector colour. They cannot use a
+reserve edge from $W_j$ into $U_{j+1}$, or a current connector edge with
+both ends in $U_{j+1}$. Connectors belonging to $E[P]$ are immediately
+removed from its unused graph. The induction on support therefore
+continues with $P_{j+1}$.
+
+The steps cost at most $6\sum_j|P_j|+4\sum_j|W_j|\le52|P|$ objects.
+The final graph is empty if $h\le1$. Otherwise it is on
+$h\le48|P|/L$ vertices and has a decomposition
+into at most $2h\log h+h\le144|P|$ objects.
+For completeness, this elementary bound follows by removing cycles
+greedily. A graph with $m>h$ edges has a subgraph of minimum degree
+at least $m/h$, by iterative deletion of vertices of smaller degree.
+A longest path in that subgraph gives a cycle of length at least $m/h$.
+In each range $(2^ih,2^{i+1}h]$, at most $2h$ removals suffice; finally
+pay the at most $h$ remaining edges. Thus the total is below $200|P|$.
+All additional edges used belong to $O$, as required.
+\end{proof}
+
+\section{Closing two-edge paths into cycles}
+\begin{lemma}[Greedy grouping]\label{lem:cherry}
+Let $B$ be an edge set such that every edge has a port endpoint. Partition
+the ports into classes $P_Y\subseteq Y$, and suppose every $B$-edge
+at a port in $P_Y$ has its other endpoint outside $Y$.
+Let $d,K$ be positive integers, with every port of degree at most $d$. Put
+$m_Y=\max_x|\{u\in P_Y:xu\in B\}|$.
+For each $Y$ suppose $K$ edge-disjoint available graphs can link every
+pair multiset in $P_Y$ of multiplicity at most $d$, through pairwise
+disjoint sets $T_{Y,1},\ldots,T_{Y,K}\subseteq Y\setminus P_Y$.
+Reservoir edges are disjoint across all classes and avoid $B$.
+
+Then $B$, together with some reservoir edges, decomposes into a residual
+set $J\subseteq B$ and at most
+\begin{equation}\label{eq:cherry-cost}
+ \tfrac12\sum_Ym_Y+2d\,\#\{Y\}+|B|/(2K)
+\end{equation}
+simple cycles. For every nonport $x$ and class $Y$, $J$ has at most
+one edge joining $x$ to $P_Y$.
+\end{lemma}
+\begin{proof}
+Assign each edge to one port endpoint, arbitrarily. Within each class,
+delete one edge at every centre of odd assigned degree, putting it in
+$J$. Pair all other edges at each centre into two-edge paths $u-x-v$.
+One such path conflicts with at most $m_Y/2+2d-3$ others by sharing a
+vertex. Greedily put the paths into groups of size at most $K$, opening
+a new group only if every old one is full or has a conflict. For a
+class with $N_Y>0$ paths, this uses at most
+$m_Y/2+2d-3+\lceil N_Y/K\rceil$ groups.
+Indeed at most the conflict degree old groups can be forbidden by
+conflicts, and every other old group must be full.
+
+Order a group's vertex-disjoint paths as
+$p_1-x_1-q_1,\ldots,p_k-x_k-q_k$ and connect $q_j$ to $p_{j+1}$
+cyclically through $T_{Y,j}$. For each slot $j$ make all requests
+simultaneously over all groups. A port occurs in at most $d$ requests,
+so the required connectors exist. Within a group their interiors are
+disjoint and avoid all the two-edge paths. Their cyclic concatenation
+is therefore a simple cycle, even for a one-path group.
+All cycles are edge-disjoint by the routing and reservoir hypotheses.
+Summing the grouping bound proves \eqref{eq:cherry-cost}.
+Every edge at a nonport was necessarily assigned toward its port, so
+only the one parity deletion per centre and class can survive in $J$.
+\end{proof}
+
+\section{Moving the leftovers into a small graph}
+We record the quotient argument with its exact lifting obligation.
+Its purpose is to count copies of a vertex without ever identifying two
+occurrences of that vertex inside one lifted cycle.
+
+\begin{lemma}[Compression]\label{lem:quotient}
+Suppose the vertices involved have disjoint roles: hubs $A$, ports $U$,
+middles $X$, and pools $W_L,W_R$. There are edge-disjoint cores of two
+kinds: hub edges $au$, and port objects $uv$ or $uxv$ with $u\ne v$.
+At a port, the total number of hub edges and port-object ends is at
+most an integer $d\ge2$; each middle lies in at most $d$ objects.
+Every port $u$ has available donor neighbours
+$C_L(u)\subseteq W_L$, $C_R(u)\subseteq W_R$, each of size at least
+$H\ge4d+4$. Donor edges avoid all cores.
+Suppose, for each hub $a$ and pool vertex $w$,
+\begin{equation}\label{eq:mu-condition}
+ |\{u:au\text{ is a core},\ w\in C_L(u)\cup C_R(u)\}|\le\mu(w).
+\end{equation}
+If the numbers of hub cores and port objects are each at most $nd$,
+there are paid core edges and a simple graph $Q$ such that
+\begin{equation}\label{eq:quotient-size}
+ \#\mathrm{paid}+|V(Q)|
+ \le |A|+d^3\sum_{w\in W}\mu(w)
+       +3dt_0|W|+C n\left(\frac dH+\frac1d\right),
+ \quad t_0=\lceil2\log d\rceil,
+\end{equation}
+where $W=W_L\sqcup W_R$. Every cycle/edge decomposition of $Q$ lifts
+to a decomposition of all unpaid cores plus some donor edges using
+at most twice as many objects. Donor edges assigned to singleton
+quotient edges are left unused.
+\end{lemma}
+\begin{proof}
+For a loopless multigraph with edge multiplicities $m(v,w)$, put the
+$i$th edge of each parallel class in a separate simple graph and delete
+isolated vertices. The resulting disjoint union has
+\begin{equation}\label{eq:ranks}
+ \sum_v\max_w m(v,w)
+\end{equation}
+vertices. Each layer contains at most one copy of each real vertex.
+
+\emph{Hub cores.}
+At each hub group its edges in groups of size $\lfloor H/2\rfloor$,
+except possibly the last, which can be smaller.
+If there are $E$ hub edges, there are at most $|A|+4E/H$ groups.
+Colour each group independently and uniformly with one of $d^3$ colours.
+Pay an edge if another edge at its port has the same colour.
+Edges at a port come from distinct hubs, hence distinct independently
+coloured groups. The expected payment is at most $E(d-1)/d^3$.
+
+For every surviving $au$, choose a donor neighbour $w$ greedily, avoiding
+earlier choices at $u$ and earlier choices in its group.
+Fewer than $d+H/2$ vertices are forbidden, so this is possible.
+In each colour, replace $au$ by the quotient edge $aw$, representing
+the path $a-u-w$, and split parallel edges into ranks.
+For any hub, its multiplicity at a fixed pool vertex is at most its
+number of groups in that colour. Thus total hub copies are at most
+$|A|+4E/H$. By \eqref{eq:mu-condition}, total pool copies here are at
+most $d^3\sum_W\mu(w)$.
+Within a colour each port is used once, so internal vertices of the
+representing paths are private.
+
+\emph{Port objects.}
+Greedily colour these objects with at most $3d$ colours so that objects
+in one colour have disjoint ports and middles. This works because an
+object conflicts with at most $3(d-1)$ others.
+Orient every object between its two ports. At each port independently,
+inject its tail ends uniformly into $C_L(u)$ minus the hub choices,
+and its head ends uniformly into the corresponding right set.
+Each target set has size at least $H-d\ge H/2$, and each domain size
+at most $d$. All donor edges at a port are now distinct.
+A port object becomes a quotient edge from its left to its right
+junction. The representing path has length three or four.
+For each colour, rank-split this bipartite multigraph as above.
+
+Here is the entire load estimate. For independent labels
+$Z_1,\ldots,Z_m$ with every atom of probability at most $p$, let $L_z$
+be their counts. For each integer $t\ge1$,
+\begin{equation}\label{eq:occupancy}
+ \E\max_zL_z\le t\mathbf1_{m>0}+2emp+4e2^{-t}m.
+\end{equation}
+Indeed, put $\mu_z=\E L_z$. Factorial moments give
+$\Prob(L_z\ge j)\le(e\mu_z/j)^j$. Set $T=\max(t,\lceil2emp\rceil)$.
+For $j\ge T$, this is at most
+$(e\mu_z/j)2^{1-j}$. Summing the tail gives
+$\E[L_z\mathbf1_{L_z\ge T}]\le4e\mu_z2^{-T}$.
+Now use $\max_zL_z\le T-1+\sum_z L_z\mathbf1_{L_z\ge T}$ and
+$\sum_z\mu_z=m$. The case $m=0$ is immediate.
+
+Fix an object colour and expose its tail junctions. For each left
+junction $w$, the head junctions of objects starting there are
+independent, with atom probabilities at most $2/H$: within this colour
+all ports are distinct. Apply \eqref{eq:occupancy}, and then sum over
+$w$ and colours. Reverse left and right for the other side.
+If there are $P$ port objects, \eqref{eq:ranks} gives expected copies at most
+\[
+ 3dt_0|W|+8eP/H+8e2^{-t_0}P.
+\]
+This bound holds conditional on every outcome of the hub step.
+The expectation of the \emph{single sum} of payments and all copies
+therefore satisfies \eqref{eq:quotient-size}. Averaging fixes one outcome
+with that bound.
+
+\emph{Lifting.}
+Keep different colours, ranks and kinds in separate components of $Q$.
+Within each component, distinct quotient vertices represent distinct real
+branch vertices. Representing paths have private interior vertices, and
+no interior vertex is a branch vertex.
+Thus a simple cycle of $Q$ lifts to a simple cycle. All representing
+paths are edge-disjoint, even across components, because cores and
+donor choices are distinct. For a singleton quotient edge, output only
+its core: one edge, or two edges for $uxv$. Return its donor edges
+unused. This proves the precise lifting assertion and the factor two.
+\end{proof}
+
+\section{Preparing the reservoirs}
+All hierarchy choices and port classes are now fixed.
+For a leaf $Y$ from round $r$ put
+\[
+ k_r=\sum_{l\ge r+2}(M_l^2+1).
+\]
+By \eqref{eq:tworound}, $k_r=\lambda_r^{o(1)}$. If $k_r>0$, colour
+each edge of $H_Y$ independently: an own colour with probability
+$1/2$, and each of $k_r$ lending colours with probability
+$p_r=1/(2k_r)\ge\lambda_r^{-4}$.
+For each target round $l$, reserve $M_l^2$ colours for closing paths
+and one colour for quotient donor edges. If $k_r=0$, keep all edges
+in the own colour.
+
+For each pair $(Y,l)$, independently give every vertex of $Y$ one of
+$M_l^2$ slot labels, each with probability $\rho_l=M_l^{-4}$, or a
+neutral label with the remaining probability. Write $T_{Y,l,j}$ for
+the slot sets. They are disjoint for fixed $(Y,l)$, and are independent
+of edge colours. Call $Y$ good if its own graph is robust enough for
+Lemma~\ref{lem:retire}, all lending graphs have the robustness from
+Lemma~\ref{lem:split}, and each closing colour links demands of
+multiplicity $M_l$ through its corresponding $T_{Y,l,j}$.
+
+These conditions fail with probability at most $|Y|^{-2}$.
+Here are the scale checks, to make this assertion quantitative.
+Writing $N=|Y|$, we have
+\[
+ \lambda_r^{103}\le N\le M_r,\qquad \log N\le3\lambda_r,
+ \qquad M_l\le\lambda_r\quad(l\ge r+2).
+\]
+An atom has robustness at least $\lambda_r^{96}/2$ by direct Bernoulli
+edge splitting. The linking requirement is only
+$C M_l^{13}(\log N)^{18}\le C'\lambda_r^{31}$.
+The own graph has robustness at least $s_r/4\gg C\log^{42}N$.
+There are at most $k_r+1\le\lambda_r^4+1$ graphs, so their splitting
+failures and $N^{-3}$ linking failures sum to at most $N^{-2}$ for
+large $D$. All labels and class choices were fixed independently in
+the required order.
+
+A classed port $u$ at round $l$ is \emph{lost} if its class $Y(u)$ is
+bad, or if it has a nonneutral slot label for $(Y(u),l)$.
+Write $\Lost_l$ for these ports. Since the class was fixed before sampling,
+\begin{equation}\label{eq:lost}
+ \Prob(u\in\Lost_l)\le M_l^{-2}+|Y(u)|^{-2}\le2M_l^{-2},
+ \qquad \E\sum_l(200+M_l)|\Lost_l|=o_D(n).
+\end{equation}
+A surviving port avoids every slot set of its class. Bad leaves lend
+nothing: every possible consumer of such a class has been declared lost.
+
+\emph{Disjoint pools for the quotient.}
+All pool quantities and their sums below are indexed by $3\le l\le R$;
+there are no lost ports in the first two rounds.
+Independently of the preceding experiment, give each original vertex
+one label $(l,r,\sigma)$, where $3\le l\le R$, $r\le l-2$ and
+$\sigma\in\{L,R\}$, with probability
+\[
+ \tfrac12q_l\pi_{l,r},\qquad q_l=M_l^{-5},\quad
+ \pi_{l,r}=2^{-(l-1-r)}.
+\]
+The total mass is less than one by \eqref{eq:sums}; all remaining mass
+gets a null label. Let $W_{l,r,\sigma}$ be these disjoint sets,
+$W_{l,\sigma}=\bigcup_rW_{l,r,\sigma}$, and
+$W_l=W_{l,L}\sqcup W_{l,R}$.
+For a possible classed port $u$ with class $Y$ from round $r$, its
+candidates $C_\sigma(u)$ are its neighbours in $W_{l,r,\sigma}$ by
+edges of $Y$'s quotient lending colour for round $l$.
+
+For each side, the candidate count is a sum of independent Bernoulli
+variables over distinct neighbours. Robustness gives
+$\deg_{H_Y}(u)>s_r$, so its mean is at least
+\[
+ \lambda_r^{96}2^{-(l-r)}M_l^{-5}
+ \ge\lambda_{l-2}^{95}/(4M_l^5).
+\]
+For the last inequality, set $j=l-2-r$ and use
+$\lambda_r\ge2^j\lambda_{l-2}$.
+Set
+\begin{equation}\label{eq:H}
+ H_l=\left\lfloor\frac{\lambda_{l-2}^{95}}{16M_l^5}\right\rfloor.
+\end{equation}
+By \eqref{eq:tworound}, $H_l\ge M_l^{10}$ for large $D$.
+Call a possible port deficient if either candidate set has size less
+than $H_l$. Chernoff bounds this probability by $2e^{-H_l/4}$.
+
+\emph{Accounting that allows the later graph to depend on the pools.}
+For a hub $h\in A_l$, let $c_l(h)$ be the number of classes with any
+possible assigned round-$l$ edge from $h$ to a port of that class.
+Define a deterministic weight
+\[
+ \omega_l(v)=\begin{cases}c_l(v)&v\in A_l,\\M_l&v\notin A_l.
+ \end{cases}
+\]
+After Lemma~\ref{lem:cherry}, any residual $J_l$ has hub degrees at
+most $c_l(h)$ and nonhub degrees at most $M_l$. Thus the number of
+its edges touching $W_l$ is always at most
+$\sum_{v\in W_l}\omega_l(v)$, even when $J_l$ depends on the pools.
+Each hub--class incidence has a distinct original edge witnessing it,
+and there are at most $nM_l$ edges touching possible ports. Hence
+\begin{equation}\label{eq:pool-payment}
+ \sum_v\omega_l(v)\le2nM_l,\qquad
+ \E\sum_{v\in W_l}\omega_l(v)\le2n/M_l^4.
+\end{equation}
+Similarly all residual edges at deficient ports are dominated by $M_l$
+times the number of deficient possible ports; its expectation is at
+most $2nM_le^{-H_l/4}=o(n/M_l^4)$.
+
+Let $\mu_r(w)$ count the round-$r$ retained leaves containing $w$.
+By \eqref{eq:overlap}, $\sum_w\mu_r(w)<4n/3$.
+For $w\in W_{l,r,L}\cup W_{l,r,R}$ use $\mu(w)=\mu_r(w)$.
+The hub--class uniqueness of $J_l$ proves \eqref{eq:mu-condition}:
+hub edges that can choose $w$ have distinct classes from round $r$,
+all containing $w$.
+Put $t_l=\lceil2\log M_l\rceil$ and
+\[
+ T_l=M_l^3\sum_{w\in W_l}\mu_{r(w)}(w)+3M_lt_l|W_l|.
+\]
+Its expectation is at most
+$\tfrac43n/M_l^2+3nt_l/M_l^4$.
+Consequently the expectation of the single nonnegative sum
+\begin{equation}\label{eq:objective}
+ Z=\sum_{l=3}^R\left[(200+M_l)|\Lost_l|
+       +\sum_{v\in W_l}\omega_l(v)
+       +M_l\#\{\text{deficient possible ports in round }l\}+T_l\right]
+\end{equation}
+is $o_D(n)$. Fix one outcome with $Z\le\E Z$.
+This one averaging choice controls all these terms together; no
+independence from the adaptive residual graphs is asserted.
+
+\section{Assembly and the contraction}
+Process rounds in descending order. For a retained leaf $Y$, remove
+from $E_r(Y)$ exactly the reservoir edges already borrowed and used by later rounds,
+and call the remainder $F_Y$. If $Y$ is good, its own graph
+$\Own_Y$ is wholly available in $F_Y$. If $Y$ is bad, it has lent
+nothing, so its full $H_Y$ is available. Use this available robust
+graph as the device for Lemma~\ref{lem:retire}.
+
+Within $Y$ retire its hubs, its fresh unique ports and its lost ports.
+The remaining edges $B_Y\subseteq F_Y$ all touch a surviving classed
+port. The retirement cost summed over all pieces is
+\[
+ 200\sum_{r,Y}|Y\cap A_r|+200\sum_r|\mathrm{Fresh}_r|
+      +200\sum_r|\Lost_r|
+ \le400n+o_D(n).
+\]
+For the first two rounds all unique ports are fresh, so retirement
+already finishes those rounds.
+
+At round $l\ge3$ apply Lemma~\ref{lem:cherry} to
+$B=\bigcup_Y B_Y$ with $d=M_l$ and $K=M_l^2$.
+The separation property \eqref{eq:separation} places the centre of a
+class-$Y$ edge outside $Y$. Surviving class-$Y$ ports avoid all of
+$T_{Y,l,j}$. Good reservoirs therefore meet all hypotheses of the
+lemma. The colours for this target round are still unused.
+Since $|B|\le nM_l$, the cycle cost is at most
+\[
+ \tfrac12\sum_Ym_{Y,l}+2M_l\nu_l+n/(2M_l).
+\]
+Its sum is $o_D(n)$ by \eqref{eq:concentration},
+\eqref{eq:ancestors} and \eqref{eq:sums}.
+Record every reservoir edge used by these closing cycles against its
+unique owner, for removal when that owner is processed.
+
+The resulting $J_l$ has every edge incident to a surviving classed
+port, degree at most $M_l$ outside the hubs, and at most one edge at
+each hub and class. Pay all its edges touching lost vertices, pool
+vertices or deficient ports. These payments are bounded by the
+corresponding terms of \eqref{eq:objective}. At every remaining fresh
+vertex, pair its edges into two-edge port paths and pay an unpaired
+edge, if any. The latter payments sum to at most $2n$ by
+\eqref{eq:fresh}. The two ends of each fresh path are distinct because the graph
+is simple. The cores now consist of hub edges, port--port edges and
+port--fresh--port paths. Their roles are disjoint from $W_l$.
+
+Apply Lemma~\ref{lem:quotient} with $d=M_l$, $H=H_l$. Both kinds
+of core number at most $nM_l$. For every history, its averaging
+argument produces paid cores and a simple graph $Q_l$ with
+\begin{equation}\label{eq:Ql}
+ \#\mathrm{paid}_l+|V(Q_l)|
+ \le |A_l|+T_l+C n(M_l/H_l+1/M_l).
+\end{equation}
+Choose a minimum cycle/edge decomposition of $Q_l$ and lift it.
+Record only donor edges actually used in lifted cycles. In particular,
+assigned connectors belonging to singleton quotient edges are returned.
+Remove the recorded edges from their owners when those owners are
+processed later in the descending order.
+
+All edges are accounted for exactly once. The assigned sets
+$E_r(Y)$, the removed long cycles and the final sparse residual
+partition the original edge set. Reservoir colours have exclusive
+consumers. Each borrowed edge is deleted once from its owner's
+assigned set; each unused donor stays with its owner. Local retirement,
+closing, and quotient lifting are exact decompositions of their stated
+edge sets. Thus the descending construction neither reuses nor loses
+an edge. The estimates hold uniformly in the earlier choices of
+quotient decompositions.
+
+Summing \eqref{eq:Ql}, using \eqref{eq:objective}, \eqref{eq:hub},
+$H_l\ge M_l^{10}$ and \eqref{eq:sums}, gives
+\[
+ \sum_{l=3}^R\bigl(\#\mathrm{paid}_l+|V(Q_l)|\bigr)=o_D(n).
+\]
+All other costs total at most $C_0(D)n$: retirement costs $400n+o_D(n)$,
+unpaired fresh edges at most $2n$, long cycles and closing cycles
+$o_D(n)$, pool/lost/deficient payments $o_D(n)$, and the final
+residual $Dn/2$. Choose $D$ once so that $\sum_l|V(Q_l)|\le n/4$.
+All requirements on $D$ involved only absolute constants and fixed
+powers of logarithms, never $n$ or the desired final constant.
+We have proved \eqref{eq:reduction}.
+
+Finally induct on $n$. The empty graph is immediate. Every $Q_l$ has
+fewer than $n$ vertices for $n>0$, so
+\[
+ f(G)\le C_0n+2\sum_l2C_0|V(Q_l)|\le2C_0n.
+\]
+This completes the reconstruction of Theorem~\ref{thm:main}.
+
+\paragraph{Provenance and status.}
+The hierarchy, lending strategy and reduction to small quotients come
+from the submitted proof \cite{Claim}, building on \cite{BM}.
+Keeping every piece whole, the bounded-degree sampling certificate,
+the direct cycle grouping, and the simplified quotient are changes
+to that argument. The main external combinatorial inputs are
+Lov\'asz's path corollary and Haxell's theorem, stated in Section 2.
+Independent static checks found no remaining gap, but the revised
+proof has not been formally verified. No Lean compilation was run.
+
+\begin{thebibliography}{9}
+\bibitem{BM} M. Buci\'c and R. Montgomery,
+\emph{Towards the Erd\H{o}s--Gallai cycle decomposition conjecture},
+Advances in Mathematics 437 (2024), 109434.
+\href{https://arxiv.org/abs/2211.07689}{arXiv:2211.07689}.
+\bibitem{Haxell} P. E. Haxell,
+\emph{A condition for matchability in hypergraphs},
+Graphs and Combinatorics 11 (1995), 245--248.
+\bibitem{Claim} R. Coffey, \emph{erdos-gallai-lean}, proof claim and
+accompanying manuscript, inspected commit
+\texttt{660ae11bf3e975fca77869d7f2cf227d05445140}.
+\href{https://github.com/steelwheel01/erdos-gallai-lean}{Repository};
+\href{https://www.erdosproblems.com/forum/thread/184/proof-claims\#proof-claim-379}{proof claim}.
+\end{thebibliography}
+\end{document}
