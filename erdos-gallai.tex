@@ -150,7 +150,7 @@ $n/(2\lambda^2)$ of them. The graph that remains has no long cycles, so all its
 expanding subgraphs are small, since expanders contain long cycles. One then
 splits it into robust sublinear expanders, called \emph{pieces}, of order at
 most $d^2$, deleting a few edges along the way. The deleted edges, together
-with the edges of a few tiny pieces, form the graph $G_{r+1}$ of the next
+with the edges of a few small leftover parts, form the graph $G_{r+1}$ of the next
 round, whose average degree is only polylogarithmic in~$d$. After about
 $\log^\star n$ rounds the remaining graph has bounded average degree, and its
 edges are simply taken as single edges.
@@ -163,9 +163,9 @@ time.
 
 \paragraph{Anchors.} The key observation, due to Coffey~\cite{Cof}, is that
 earlier pieces are vastly richer than anything that happens two rounds later.
-A piece of round $r$ is an $s_r$-expander with $s_r=\lambda_r^{100}$, so all its
+A piece of round $r$ is an $s_r$-expander with $s_r\approx\lambda_r^{100}$, so all its
 degrees exceed $\lambda_r^{100}$. A piece of round $\ell\ge r+2$ has at most
-$M_\ell=d_\ell^2$ vertices, and two rounds of polylogarithmic decay give
+$M_\ell\approx d_\ell^2$ vertices, and two rounds of polylogarithmic decay give
 $M_\ell\le(\log\lambda_r)^{O(1)}$ (\cref{lem:scales}). So a piece of round $r$
 can set aside, for each later round, a random slice of its edges which is still
 a robust expander with degrees far larger than anything in that round. One round
@@ -238,8 +238,8 @@ $Y$. This gives \emph{cherries} $u\,x\,v$ with both ends in $Y$. The edges lent
 by $Y$ can join the last vertex of one cherry to the first vertex of the next,
 and so chain many vertex-disjoint cherries into a single long cycle
 (\cref{fig:cherries}). In this way almost all edges at ports turn into few
-cycles. What remains is at most one edge between each vertex $x$ and the ports
-of each anchor.
+cycles. What remains is at most one edge between each non-port $x$ and the
+ports of each anchor.
 
 \paragraph{The quotient.} A typical leftover edge joins a hub $h$ to a port $u$
 with anchor $Y$. We extend it by a private edge $uw$ lent by $Y$ to a vertex $w$
@@ -387,7 +387,7 @@ both ends in a set $W$, then its edges decompose into at most $|W|$ paths.
 The second statement follows from the first because every path has two
 distinct ends.
 
-\begin{lemma}[Long cycles]\label{lem:egp}
+\begin{lemma}[Greedy cycle removal]\label{lem:egp}
 Every graph $H$ on $h\ge1$ vertices satisfies $f(H)\le h(\log h+1)$.
 \end{lemma}
 
@@ -435,9 +435,9 @@ exposure martingale; see also~\cite{McD}.
 Let $\xi_1,\dots,\xi_k$ be independent $\{0,1\}$-valued random variables with
 $\Pr(\xi_i=1)=p_i$, and let $Z=\phi(\xi_1,\dots,\xi_k)$, where changing $\xi_i$
 alone changes $\phi$ by at most $c_i\le c$. Put
-$\beta=\sum_ip_i(1-p_i)c_i^2$. Then for all $\lambda>0$,
+$\sigma^2=\sum_ip_i(1-p_i)c_i^2$. Then for all $x>0$,
 \[
-\Pr(Z\le\E Z-\lambda)\le\exp\Bigl(-\frac{\lambda^2}{2(\beta+c\lambda/3)}\Bigr).
+\Pr(Z\le\E Z-x)\le\exp\Bigl(-\frac{x^2}{2(\sigma^2+cx/3)}\Bigr).
 \]
 \end{lemma}
 
@@ -594,13 +594,13 @@ $E(H)$ is the disjoint union of $E(H_1)$, $E(H_2)$ and $F$ (\cref{fig:split}).
 
 \begin{proof}
 Choose $U$ and $F'$ with $1\le|U|\le2m/3$, $|F'|\le s|U|$ and
-$|\NN_{H-F'}(U)|<\eps|U|/\log^2m$. Let $N=\NN_{H-F'}(U)$ and
-$C_0=V(H)\setminus(U\cup N)$. All edges between $U$ and $C_0$ lie in $F'$, so
-$F_0=E_H(U,C_0)$ has at most $s|U|$ edges. Let $U^+$ be the set of vertices
+$|\NN_{H-F'}(U)|<\eps|U|/\log^2m$. Let $S=\NN_{H-F'}(U)$ and
+$C'=V(H)\setminus(U\cup S)$. All edges between $U$ and $C'$ lie in $F'$, so
+$F_0=E_H(U,C')$ has at most $s|U|$ edges. Let $U^+$ be the set of vertices
 $u\in U$ with $\deg_{F_0}(u)\ge\tau$, and let $A=U\setminus U^+$. Let $C^+$ be
-the set of vertices of $C_0$ with at least $\tau$ neighbours in $A$. Put
+the set of vertices of $C'$ with at least $\tau$ neighbours in $A$. Put
 \[
-B=N\cup U^+\cup C^+,\qquad C=C_0\setminus C^+.
+B=S\cup U^+\cup C^+,\qquad C=C'\setminus C^+.
 \]
 The edges of $F_0$ at vertices of $U^+$ and the edges between $C^+$ and $A$ are
 disjoint subsets of $F_0$. Hence
@@ -610,7 +610,7 @@ $\tau(|U^+|+|C^+|)\le s|U|$, and so $|U^+|+|C^+|\le|U|/(256\log^2m)=
 |B|<\frac{9\eps|U|}{8\log^2m}\le\frac{2\eps|A|}{\log^2m},\qquad
 |A|+|B|\le|U|+|B|\le\tfrac23m\bigl(1+\tfrac{9}{256}\bigr)<\tfrac34m.
 \]
-Every edge between $A\subseteq U$ and $C\subseteq C_0$ lies in $F_0$, so
+Every edge between $A\subseteq U$ and $C\subseteq C'$ lies in $F_0$, so
 $|F|\le s|U|\le2s|A|$. If $s=0$ then $F_0=\varnothing$. Finally, a vertex of
 $A$ has $\deg_{F_0}<\tau$, and a vertex of $C$ has fewer than $\tau$ neighbours
 in $A$ by the definition of $C^+$.
@@ -640,8 +640,8 @@ in $A$ by the definition of $C^+$.
   \draw[decorate,decoration={brace,amplitude=5pt}] (0,3.0) -- (5.4,3.0) node[midway,above=4pt,lbl] {$H_1=H[A\cup B]$};
   \draw[decorate,decoration={brace,amplitude=5pt,mirror}] (4.0,-0.75) -- (9.4,-0.75) node[midway,below=4pt,lbl] {$H_2=H[B\cup C]-E(H[B])$};
 \end{tikzpicture}
-\caption{A splitting step (\cref{lem:split}). The separator $B=N\cup U^+\cup
-C^+$ consists of the small boundary $N$ of $U=A\cup U^+$ and the vertices that
+\caption{A splitting step (\cref{lem:split}). The separator $B=S\cup U^+\cup
+C^+$ consists of the small boundary $S$ of $U=A\cup U^+$ and the vertices that
 would otherwise have many deleted edges. The children overlap only in $B$; edges
 inside $B$ go to $H_1$. The few deleted edges between $A$ and $C$ form a thin
 cut: no vertex has $\tau$ or more of them.}
@@ -774,7 +774,7 @@ length at least $d_r\lambda_r^2$, as long as there is one. Let $\cC_r$ be the
 set of removed cycles and $G_r'$ the remaining graph.
 \item\label{it:R2} \emph{Splitting.} Build a splitting tree $\cT_r$ for $G'_r$ in
 two stages. In the first stage, split every node with at least two vertices
-that is not a $0$-expander, with $s_H=0$. The leaves of the first stage are
+that is not a $0$-expander, with $(s_H,\tau_H)=(0,\tau_r)$. The leaves of the first stage are
 $0$-expanders or single vertices. In the second stage, split every node of
 order at least $m_r$ that is not an $s_r$-expander, with $(s_H,\tau_H)=
 (s_r,\tau_r)$. The leaves of order at least $m_r$ are $s_r$-expanders and are
@@ -871,7 +871,7 @@ $\lambda_r\ge2^{\ell-r}\lambda_\ell\ge2^{\ell-r}$.
 is at most $(\log\log D)^{-a}\sum_{j\ge0}(j+1)^k2^{-aj}$.
 \end{proof}
 
-Part~\ref{it:sc-sum} is the only place where the number of rounds enters. It is
+Part~\ref{it:sc-sum} is the main place where the number of rounds enters. It is
 why no factor $\log^\star n$ appears: quantities charged once per round, or even
 once per pair of rounds, are summable because the parameters grow like a tower
 towards earlier rounds.
@@ -1106,12 +1106,12 @@ vertices outside $W$ have an $(H'-F)$-neighbour in $S$.
 
 \begin{proof}
 Let $Z$ be the number of vertices outside $W$ with a $\Gamma$-neighbour in $S$. A
-vertex of $\Gamma$-degree $r\ge1$ is counted with probability
-$1-(1-p)^r\ge pr/2$, since $pr\le pd\le1+p\le3/2$. So
+vertex of $\Gamma$-degree $i\ge1$ is counted with probability
+$1-(1-p)^i\ge pi/2$, since $pi\le pd\le1+p\le3/2$. So
 $\E Z\ge p|\Gamma|/2\ge\alpha|W|/8$. Changing whether $w\in W$ lies in $S$
 changes $Z$ by at most $\deg_\Gamma(w)\le d$, and
-$\beta=\sum_wp(1-p)\deg_\Gamma(w)^2\le pd|\Gamma|\le2d\E Z$. By
-\cref{lem:freedman} with $\lambda=\E Z/2$ and $d\le2/p$,
+$\sigma^2=\sum_wp(1-p)\deg_\Gamma(w)^2\le pd|\Gamma|\le2d\E Z$. By
+\cref{lem:freedman} with $x=\E Z/2$ and $d\le2/p$,
 \[
 \Pr\bigl(Z<\tfrac12\E Z\bigr)\le\exp\Bigl(-\frac{3\E Z}{52d}\Bigr)
 \le\exp\Bigl(-\frac{\alpha p|W|}{300}\Bigr).\qedhere
@@ -1228,15 +1228,15 @@ using some further edges of $O$. Every edge of $E\setminus(E[P]\cup O')$ has an
 end outside $P$.
 
 The proof uses a \emph{vortex}, a nested sequence of random sets
-$P=P_0\supseteq P_1\supseteq\dots\supseteq P_J$ whose sizes halve. This device
+$P=P_0\supseteq P_1\supseteq\dots\supseteq P_k$ whose sizes halve. This device
 comes from iterative absorption~\cite{BKLO}. At step $j$ we decompose all
-remaining edges that touch the layer $W_j=P_j\setminus P_{j+1}$ into paths
+remaining edges that touch the layer $\Lambda_j=P_j\setminus P_{j+1}$ into paths
 (\cref{lem:lovasz}). We extend each path at both ends so that it ends in the
 next level, and close it into a cycle by a connecting path through a random set
 inside the next level (\cref{fig:clear}). Closing paths through
 path-connecting random sets is the method of~\cite{BM}. Combining it with a
-vortex is due to Coffey~\cite{Cof}. What survives all $J$ steps lives on the
-tiny set $P_J$ and is decomposed by \cref{lem:egp}.
+vortex is due to Coffey~\cite{Cof}. What survives all $k$ steps lives on the
+tiny set $P_k$ and is decomposed by \cref{lem:egp}.
 
 \begin{proof}
 Let $L=\log N$, and assume $P\ne\varnothing$.
@@ -1251,25 +1251,25 @@ $(w,y)$ to the load slots of $y$ and to the spare slots of $w$. A matching that
 covers the left side gives, for every $w$, at least $m$ pairs $(w,y)$ matched to
 load slots, and we let $X(w)$ consist of $m$ of these vertices $y$.
 
-We check Hall's condition~\cite{Hal}. Let $\Lambda$ be a set of pairs, let $R$
+We check Hall's condition~\cite{Hal}. Let $\Psi$ be a set of pairs, let $Y$
 be the set of their second coordinates, and let $S'$ be the set of $w$ that
-occur in more than $\deg_O(w)-m$ pairs of $\Lambda$. Then
-$|\Lambda|\le(\text{spare slots})+m|S'|$, so it suffices that
-$b|R|\ge m|S'|$. This holds trivially if $S'=\varnothing$. Otherwise every
-$w\in S'$ has fewer than $m$ neighbours outside $R$. Take $U\subseteq S'$ with
+occur in more than $\deg_O(w)-m$ pairs of $\Psi$. Then
+$|\Psi|\le(\text{spare slots})+m|S'|$, so it suffices that
+$b|Y|\ge m|S'|$. This holds trivially if $S'=\varnothing$. Otherwise every
+$w\in S'$ has fewer than $m$ neighbours outside $Y$. Take $U\subseteq S'$ with
 $|S'|/2\le|U|\le2N/3$, and delete the at most $(m-1)|U|\le s|U|$ edges from $U$
-to outside $R$. Then the external neighbourhood of $U$ lies in $R$, so
-$|R|\ge\eps|U|/L^2\ge\eps|S'|/(2L^2)$, and $b|R|\ge m|S'|$.
+to outside $Y$. Then the external neighbourhood of $U$ lies in $Y$, so
+$|Y|\ge\eps|U|/L^2\ge\eps|S'|/(2L^2)$, and $b|Y|\ge m|S'|$.
 
-\emph{The random vortex.} Let $J=\lfloor\log(L/6)\rfloor$, so that
-$6/L\le2^{-J}<12/L$. Make the following independent random choices.
+\emph{The random vortex.} Let $k=\lfloor\log(L/6)\rfloor$, so that
+$6/L\le2^{-k}<12/L$. Make the following independent random choices.
 \begin{itemize}[leftmargin=2em,itemsep=1pt]
-\item Colour every edge of $O$ uniformly with one of $2J+1$ colours: a
-\emph{reserve} colour and \emph{connector} colours $(j,c)$, for $0\le j<J$ and
+\item Colour every edge of $O$ uniformly with one of $2k+1$ colours: a
+\emph{reserve} colour and \emph{connector} colours $(j,c)$, for $0\le j<k$ and
 $c\in\{1,2\}$. Let $O^{\mathrm{res}}$ and $O_{j,c}$ be the colour classes.
-\item Give every $v\in P$ a level $\lev(v)\in\{0,\dots,J\}$ with
-$\Pr(\lev(v)\ge j)=2^{-j}$, and put $\lev(v)=J$ for $v\notin P$. Let
-$U_j=\{v:\lev(v)\ge j\}$, $P_j=P\cap U_j$ and $W_j=P_j\setminus P_{j+1}$.
+\item Give every $v\in P$ a level $\lev(v)\in\{0,\dots,k\}$ with
+$\Pr(\lev(v)\ge j)=2^{-j}$, and put $\lev(v)=k$ for $v\notin P$. Let
+$U_j=\{v:\lev(v)\ge j\}$, $P_j=P\cap U_j$ and $\Lambda_j=P_j\setminus P_{j+1}$.
 \item Give every vertex a label in $\{0,1,2\}$, with probabilities
 $\frac12,\frac14,\frac14$. Let $Z_j$ and $V_{j,c}$ be the sets of vertices of
 $U_{j+1}$ with labels $0$ and $c$, respectively.
@@ -1278,46 +1278,46 @@ We claim that with positive probability the following hold:
 \begin{enumerate}[label=(V\arabic*),itemsep=1pt]
 \item\label{it:V-link} every $O_{j,c}$ links through $V_{j,c}$ with multiplicity
 $b+2$;
-\item\label{it:V-res} for every $w\in P$ and $j<J$, at least four edges of
+\item\label{it:V-res} for every $w\in P$ and $j<k$, at least four edges of
 $O^{\mathrm{res}}$ join $w$ to $X(w)\cap Z_j$;
-\item\label{it:V-size} $\sum_{j<J}|P_j|\le8|P|$ and $|P_J|\le48|P|/L$.
+\item\label{it:V-size} $\sum_{j<k}|P_j|\le8|P|$ and $|P_k|\le48|P|/L$.
 \end{enumerate}
-By \cref{lem:sample}, each $O_{j,c}$ is an $s/(4J+2)$-expander with
+By \cref{lem:sample}, each $O_{j,c}$ is an $s/(4k+2)$-expander with
 probability at least $1-N^{-10}$. Every vertex lies in $V_{j,c}$ independently
-with probability at least $2^{-J}/4\ge1/L$. So \cref{lem:link}, with
+with probability at least $2^{-k}/4\ge1/L$. So \cref{lem:link}, with
 $t=b+2=O(L^8)$ and $\rho=1/L$, gives~\ref{it:V-link} with probability
-$1-O(J N^{-3})$. It needs $s/(4J+2)\ge C_*(b+2)L^{21}$, which holds as
+$1-O(k N^{-3})$. It needs $s/(4k+2)\ge C_*(b+2)L^{21}$, which holds as
 $s\ge L^{40}$. For
 \ref{it:V-res}, the number of such edges is a sum of independent indicators,
 one for each $y\in X(w)$, with mean at least
-$m\cdot\frac1{2J+1}\cdot\frac6L\cdot\frac12\ge L^4$. So by \cref{lem:chernoff}
+$m\cdot\frac1{2k+1}\cdot\frac6L\cdot\frac12\ge L^4$. So by \cref{lem:chernoff}
 it is less than four with probability at most $e^{-L^4/3}$, and a union bound
-over the $NJ$ pairs $(w,j)$ costs $o(1)$. For \ref{it:V-size}, the means are
-$\sum_j2^{-j}|P|<2|P|$ and $2^{-J}|P|<12|P|/L$, so by Markov's inequality each
+over the $Nk$ pairs $(w,j)$ costs $o(1)$. For \ref{it:V-size}, the means are
+$\sum_j2^{-j}|P|<2|P|$ and $2^{-k}|P|<12|P|/L$, so by Markov's inequality each
 fails with probability less than $1/4$. Fix an outcome satisfying
 \ref{it:V-link}--\ref{it:V-size}.
 
-\emph{Step $j$, for $j=0,1,\dots,J-1$.} Let $E_j$ be the set of edges of $E[P]$
+\emph{Step $j$, for $j=0,1,\dots,k-1$.} Let $E_j$ be the set of edges of $E[P]$
 not used so far. We maintain that $E_j\subseteq E[P_j]$, which holds for
-$j=0$. Let $F_j$ be the set of edges of $E_j$ that meet $W_j$.
+$j=0$. Let $F_j$ be the set of edges of $E_j$ that meet $\Lambda_j$.
 \begin{enumerate}[label=(\arabic*),itemsep=2pt]
-\item For every $w\in W_j$ use \ref{it:V-res} to \emph{reserve} four edges of
+\item For every $w\in \Lambda_j$ use \ref{it:V-res} to \emph{reserve} four edges of
 $O^{\mathrm{res}}$ from $w$ to distinct outlets in $Z_j$, two for each
 \emph{phase} $c\in\{1,2\}$. Remove the reserved edges from $F_j$ if they lie in
 it.
 \item Give every remaining edge of $F_j$ a phase $c$ such that $V_{j,c}$
-contains neither of its ends. This is possible: one end lies in $W_j$, which is
+contains neither of its ends. This is possible: one end lies in $\Lambda_j$, which is
 disjoint from $U_{j+1}$, and the other end has only one label.
 \item For each phase $c$, decompose the edges of phase $c$ by
 \cref{lem:lovasz} into at most $|P_j|$ paths, with every vertex an end of at
-most two of them. At every end $w\in W_j$ of such a path, append a distinct
+most two of them. At every end $w\in \Lambda_j$ of such a path, append a distinct
 phase-$c$ reserved edge of $w$. The result is a trail whose ends lie in
-$U_{j+1}$, all of whose edges meet $W_j$, and which avoids $V_{j,c}$. Only its
+$U_{j+1}$, all of whose edges meet $\Lambda_j$, and which avoids $V_{j,c}$. Only its
 two new end vertices can repeat a vertex. So cutting out closed subtrails
 splits it into at most two cycles and at most one path $P'$ that joins its two
 ends, if they differ. All cycles have length at least three, since the graph is
 simple. The path $P'$ has length at least two, because each of its edges meets
-$W_j$ and its ends do not.
+$\Lambda_j$ and its ends do not.
 \item For each phase $c$, join the two ends of every residual path $P'$ by a
 path through $V_{j,c}$ in $O_{j,c}$, edge-disjointly, using~\ref{it:V-link}. A
 vertex of $U_{j+1}$ is an end of at most $2$ phase-$c$ paths from the
@@ -1329,34 +1329,35 @@ least two, the two together form a cycle even if the connector is a single
 edge.
 \item Pay for the unused reserved edges.
 \end{enumerate}
-The edges of $E_j$ that do not meet $W_j$ lie in $E[P_{j+1}]$. So after we also
+The edges of $E_j$ that do not meet $\Lambda_j$ lie in $E[P_{j+1}]$. So after we also
 remove the connector edges that lie in $E[P]$, the invariant
 $E_{j+1}\subseteq E[P_{j+1}]$ holds.
 
 \emph{No edge is used twice.} Step $j$ uses edges of $F_j\subseteq E_j$,
-reserved edges $wy$ with $w\in W_j$ and $y\in U_{j+1}$, and connector edges of
+reserved edges $wy$ with $w\in \Lambda_j$ and $y\in U_{j+1}$, and connector edges of
 colours $(j,1),(j,2)$. Every connector edge has both ends in $U_{j+1}$, because
 its interior lies in $V_{j,c}\subseteq U_{j+1}$ and so do the ends of residual
-paths. An earlier step $i<j$ uses only edges that meet $W_i$, reserved edges at
-$W_i$, and connector edges of colours $(i,\cdot)$. None of these is a reserved
-or connector edge of step $j$, because $W_i$ is disjoint from
+paths. An earlier step $i<j$ uses only edges that meet $\Lambda_i$, reserved edges at
+$\Lambda_i$, and connector edges of colours $(i,\cdot)$. None of these is a reserved
+or connector edge of step $j$, because $\Lambda_i$ is disjoint from
 $U_{i+1}\supseteq U_j$. Within step $j$, the connectors of one phase are
 edge-disjoint, the two phases use different colours, and connector edges do not
-meet $W_j$, so they are not in $F_j$.
+meet $\Lambda_j$, so they are not in $F_j$.
 
-\emph{The finish and the count.} After step $J-1$ the unused edges of $E[P]$
-lie in $E[P_J]$. By \cref{lem:egp} and~\ref{it:V-size} they cost at most
-$|P_J|(\log|P_J|+1)\le|P_J|(L+1)\le49|P|$ objects. Step $j$ produces at most
-three cycles per path and pays for at most $4|W_j|$ reserved edges. So all steps
+\emph{The finish and the count.} After step $k-1$ the unused edges of $E[P]$
+lie in $E[P_k]$. By \cref{lem:egp} and~\ref{it:V-size} they cost at most
+$|P_k|(\log|P_k|+1)\le|P_k|(L+1)\le49|P|$ objects. Step $j$ produces at most
+three cycles per path and pays for at most $4|\Lambda_j|$ reserved edges. So all steps
 together cost at most $6\sum_j|P_j|+4|P|\le52|P|$ objects. The total is at most
-$101|P|$, and $O'$ consists of the reserved and connector edges that were used.
+$101|P|$, and $O'$ consists of all reserved edges and of the connector edges that were
+used.
 \end{proof}
 
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[scale=1]
   \draw[piece] (0,0) ellipse (1.3 and 1.8);
-  \node[lbl] at (0,2.15) {$W_j=P_j\setminus P_{j+1}$};
+  \node[lbl] at (0,2.15) {$\Lambda_j=P_j\setminus P_{j+1}$};
   \begin{scope}
     \clip (5.6,0) ellipse (3.2 and 1.9);
     \fill[black!7] (2,0.6) rectangle (9,2.2);
@@ -1389,7 +1390,7 @@ $101|P|$, and $O'$ consists of the reserved and connector edges that were used.
   \end{scope}
 \end{tikzpicture}
 \caption{One step of the clearing lemma. A phase-1 path of remaining edges at
-$W_j$ avoids $V_{j,1}$. Its end $w_1\in W_j$ is extended by a reserved edge to an
+$\Lambda_j$ avoids $V_{j,1}$. Its end $w_1\in \Lambda_j$ is extended by a reserved edge to an
 outlet $y\in Z_j$. Its other end $p$ already lies in $P_{j+1}$. The two ends,
 both in $U_{j+1}$, are joined by a connector through $V_{j,1}$, which closes a
 cycle. Edges from $P_{j+1}$ to later levels are handled in later steps.}
@@ -1412,8 +1413,8 @@ port of $\Pi_Y$ has its other end outside $Y$;
 \item\label{it:C2} every port is incident with at most $d$ edges of $B$;
 \item\label{it:C3} for each $Y\in\cY$ there are pairwise disjoint sets
 $T_{Y,1},\dots,T_{Y,K}\subseteq Y\setminus\Pi_Y$ and graphs
-$R_{Y,1},\dots,R_{Y,K}$ such that $R_{Y,j}$ links through $T_{Y,j}$ with
-multiplicity $d$;
+$R_{Y,1},\dots,R_{Y,K}$ with $V(R_{Y,j})\supseteq Y$ such that $R_{Y,j}$ links
+through $T_{Y,j}$ with multiplicity $d$;
 \item\label{it:C4} the edge sets of all graphs $R_{Y,j}$ are pairwise disjoint and
 disjoint from $B$.
 \end{enumerate}
@@ -1506,7 +1507,8 @@ grouped so that each hub has few copies, and the random choices of donors spread
 the links evenly over the pools.
 
 \begin{lemma}[Quotient]\label{lem:quotient}
-Let $d\ge2$, $g\ge4d+4$ and $n\ge1$ be integers. Let $A$, $U$, $I$, $W^-$ and
+Let $d\ge2$, $g\ge4d+4$ and $n\ge1$ be integers; $n$ only sets the scale of the
+error term, and in our application it is $|V(G)|$. Let $A$, $U$, $I$, $W^-$ and
 $W^+$ be pairwise disjoint sets of vertices of a graph $\Gamma$ (hubs, ports,
 middles and two pools), and let $W=W^-\cup W^+$. Suppose we are given:
 \begin{itemize}[leftmargin=2em,itemsep=1pt]
@@ -1748,7 +1750,7 @@ $N^{-2}$.
 
 \subsection{Lost ports, pools and donors}\label{sec:pools}
 
-\begin{definition}[Lost and live ports]
+\begin{definition}[Lost and live ports]\label{def:lost}
 A port $u$ of round $\ell$ with anchor $Y=\anc_\ell(u)$ is \emph{lost} if $Y$ is
 bad or $u$ lies in some slot set $T_{Y,\ell,j}$. Otherwise it is \emph{live}.
 Let $\Lost_\ell$ be the set of lost ports of round $\ell$.
@@ -1836,7 +1838,10 @@ Z=\sum_{\ell=3}^R\Bigl[(101+M_\ell)|\Lost_\ell|
 +\sum_{v\in W_\ell}\omega_\ell(v)+M_\ell|\Def_\ell|
 +M_\ell^3\!\!\sum_{w\in W_\ell}\!\beta_{r(w)}(w)+3M_\ell t_\ell|W_\ell|\Bigr].
 \]
-The weights $\omega_\ell$ are deterministic. They bound the degrees in round
+The five terms of $Z$ pay, in order, for clearing lost ports and for the
+edges at lost ports (Steps 1 and 3 below), for the edges at pool vertices and at
+deficient ports (Step 3), and for the size of the quotient graphs (Step 4). The
+weights $\omega_\ell$ are deterministic. They bound the degrees in round
 $\ell$ of a leftover graph that will depend on the pools, which lets us control
 that graph without any independence (see \cref{sec:assembly}).
 
@@ -1882,9 +1887,9 @@ $O_X=H_X$ if $X$ is bad, and let
 \[
 P_X=X\cap(\Hub_\ell\cup\Fresh_\ell\cup\Lost_\ell).
 \]
-Apply \cref{lem:clear} to $O=O_X$, $E=F_X$ and $P=P_X$. Let $B_X$ be the set of
-edges of $F_X$ that remain. Each of them has an end in $X\setminus P_X$, that
-is, at a live port.
+Apply \cref{lem:clear} to $O=O_X$, $E=F_X$ and $P=P_X$, and let
+$B_X=F_X\setminus(F_X[P_X]\cup O')$ be the set of edges of $F_X$ that remain.
+Each of them has an end in $X\setminus P_X$, that is, at a live port.
 \item \emph{Close cherries} (only if $\ell\ge3$). Apply \cref{lem:cherry} to
 $B=\bigcup_XB_X$. The ports are the live ports of round $\ell$, classified by
 their anchors, and we take $d=M_\ell$, $K=M_\ell^2$, $T_{Y,j}=T_{Y,\ell,j}$ and
@@ -1894,7 +1899,7 @@ leftover set.
 $\Lost_\ell\cup W_\ell\cup\Def_\ell$. Then, at every fresh vertex
 $x\notin W_\ell$, pair up the remaining edges of $J_\ell$ at $x$ into links
 $u\,x\,v$, and pay for the leftover edge if their number is odd.
-\item \emph{Quotient.} Apply \cref{lem:quotient} with $d=M_\ell$, $g=g_\ell$,
+\item \emph{Quotient.} Apply \cref{lem:quotient} with $\Gamma=G$, $d=M_\ell$, $g=g_\ell$,
 hubs $A=\Hub_\ell\setminus W_\ell$, ports $U$ the live ports outside
 $W_\ell\cup\Def_\ell$, middles $I=\Fresh_\ell\setminus W_\ell$, pools
 $W^\pm=W_\ell^\pm$, and donor sets $D^\pm(u)$. The hub edges are the remaining
@@ -1913,7 +1918,7 @@ $O_X$ consists of own-coloured edges. If $X$ is bad, every port anchored at $X$
 is lost. So no cherry of class $X$ is ever closed and no donor set of $X$ is
 ever used, which means no edge of $X$ is in $\Used$. Moreover $O_X$ is an
 $(s_\ell/4)$-expander with $s_\ell/4\ge(3\lambda_\ell)^{40}\ge\log^{40}|X|$
-and $|X|\ge m_\ell\ge N_0$. Each resident of $X$ is a hub, a fresh vertex, a
+and $|X|\ge m_\ell\ge N_0$. Each vertex of $X$ is a hub, a fresh vertex, a
 lost port or a live port, so the edges of $B_X$ have an end at a live port.
 For $\ell\le2$ there are no ports, so $P_X=X$ and $B_X=\varnothing$.
 
@@ -1925,7 +1930,9 @@ sets $T_{Y,\ell,j}$ are pairwise disjoint and avoid the live ports anchored at
 $Y$. The graphs $R_{Y,\ell,j}$ link through them by~\ref{it:G2}, and their
 colours are used only in round $\ell$, so none of their edges is in $\Used$.
 \ref{it:C4}: The graphs $H_Y$ are pairwise edge-disjoint, and they are disjoint
-from $B\subseteq\Eas_\ell$. The resulting cycles number at most
+from $B\subseteq\Eas_\ell$. Every edge of $B$ has a live port as an end, and
+every port has fewer than $M_\ell$ edges in $\Eas_\ell$, so $|B|\le nM_\ell$.
+The resulting cycles number at most
 \[
 \sum_{Y}\Bigl(\frac{\kappa_{Y,\ell}}2+2M_\ell\Bigr)+\frac{nM_\ell}{2M_\ell^2},
 \]
@@ -1934,15 +1941,19 @@ $J_\ell$ has at most one edge between each vertex that is not a live port and
 the live ports of each anchor.
 
 \emph{Step 3.} All edges of $J_\ell$ lie in $\Eas_\ell$. So a non-hub has
-$J_\ell$-degree less than $M_\ell$, and a hub $h$ has $J_\ell$-degree at most
-$c_\ell(h)$ by the property of $J_\ell$ just stated. Hence the edges paid for at
+$J_\ell$-degree less than $M_\ell$. Every edge of $J_\ell$ at a hub $h$ ends at a
+live port, because every edge of $B$ has a live-port end and hubs are not
+ports. So, by the property of $J_\ell$ just stated, $h$ has $J_\ell$-degree at
+most $c_\ell(h)$. Hence the edges paid for at
 pool vertices number at most $\sum_{v\in W_\ell}\omega_\ell(v)$, whatever
 $J_\ell$ is. Those paid for at lost and deficient ports number at most
 $M_\ell(|\Lost_\ell|+|\Def_\ell|)$. At most one edge is paid for at each fresh
 vertex.
 
-\emph{Step 4.} After Step 3, every edge of $J_\ell$ has a live port in $U$ as
-one end. Its other end is a hub in $A$, a live port in $U$, or a fresh vertex in
+\emph{Step 4.} The sets $A$, $U$, $I$, $W^-$ and $W^+$ are pairwise disjoint,
+since hubs, ports and fresh vertices are different roles and the pools were
+removed from the first three. After Step 3, every edge of $J_\ell$ has a live
+port in $U$ as one end. Its other end is a hub in $A$, a live port in $U$, or a fresh vertex in
 $I$, since all other cases were paid for in Step~3. So the remaining edges are
 exactly the hub edges and the edges of links. Ports lie on fewer than $M_\ell$
 of these, middles on fewer than $M_\ell/2$ links, and there are at most
@@ -1987,7 +1998,7 @@ long cycles $\cC_r$ & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-cyc}\\
 single edges of $G_{R+1}$ & $<Dn/2$ & \cref{lem:hierarchy}\\
 clearing hubs & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-hub}\\
 clearing fresh vertices & $\le202n$ & \cref{lem:bookkeeping}\ref{it:bk-fresh}\\
-clearing lost ports; paying at lost, pool and deficient vertices & $\le Z$ & Step 3 and \cref{lem:Z}\\
+clearing lost ports; paying at lost, pool and deficient vertices & first three terms of $Z$ & Step 3 and \cref{lem:Z}\\
 cherry cycles & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-crowd},\ref{it:bk-anc} and \cref{lem:scales}\ref{it:sc-sum}\\
 unpaired edges at fresh vertices & $\le2n$ & \cref{lem:bookkeeping}\ref{it:bk-fresh}\\
 paid hub edges in the quotients & $\oD$ & \cref{lem:quotient}, see below\\
@@ -2006,7 +2017,7 @@ Finally, \cref{lem:quotient} gives, for each round $\ell\ge3$,
 +3M_\ell t_\ell|W_\ell|+30n\Bigl(\frac1{M_\ell^9}+\frac1{M_\ell}\Bigr).
 \]
 Summed over $\ell$, the first term is $\oD$ by
-\cref{lem:bookkeeping}\ref{it:bk-hub}, the next two are at most $Z$, and the
+\cref{lem:bookkeeping}\ref{it:bk-hub}, the next two are the last two terms of $Z$, and the
 last is $\oD$ by \cref{lem:scales}\ref{it:sc-sum}. So
 $\sum_\ell(|\cH^\ell_{\mathrm{paid}}|+|V(Q_\ell)|)=\oD$.
 
@@ -2052,9 +2063,10 @@ separator (\cref{lem:split}\ref{it:split-thin},
 random sets and large multiplicities. Its proof follows~\cite{BM}: Claims
 \ref{cl:halving} and \ref{cl:wellexp} are~\cite[Propositions~8 and~18]{BM},
 \cref{cl:sprinkle} follows~\cite[Lemma~17]{BM}, and amplification by colouring
-follows~\cite[Theorem~16]{BM}. The certificate of \cref{cl:certificate} and
-the use of Haxell's theorem simplify~\cite[Proposition~13 and
-Lemma~9]{BM}. \Cref{lem:sample} replaces~\cite[Lemma~15]{BM} and has a
+follows~\cite[Theorem~16]{BM}. The certificate of \cref{cl:certificate}
+simplifies~\cite[Proposition~13]{BM}, and in \cref{cl:haxell}, which
+follows~\cite[Lemma~9]{BM}, Haxell's theorem replaces the theorem of Aharoni
+and Haxell~\cite{AH} used there. \Cref{lem:sample} replaces~\cite[Lemma~15]{BM} and has a
 standard proof.
 \item \emph{Anchors, reservoirs, cherries and the quotient.} The idea of lending
 random colour classes of pieces at least two rounds back, of closing cherries
