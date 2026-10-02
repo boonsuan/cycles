@@ -103,18 +103,20 @@ and digested. It should not be cited as an established result.}}
 \end{center}
 
 \begin{abstract}
-Erd\H{o}s and Gallai conjectured in the 1960s that the edge set of every graph
-on $n$ vertices can be partitioned into $O(n)$ cycles and edges. Buci\'c and
-Montgomery came within an iterated logarithm of this, proving the bound
-$O(n\log^\star n)$: they peel off robust sublinear expanders in about
-$\log^\star n$ rounds, and each round costs $O(n)$. We give a complete,
-reorganised and simplified account of a proof of the full conjecture claimed by
-Coffey. The new idea is that an expander found in one round is so much richer
-than anything that happens two rounds later that it can serve as a reservoir of
-connecting paths for all subsequent rounds. With these reservoirs each vertex
-pays a constant only at its first two appearances. The few edges that still
-cannot be closed into cycles are compressed into graphs with at most $n/4$
-vertices in total, and these are decomposed by induction.
+Erd\H{o}s and Gallai conjectured in the 1960s that the edges of every graph on
+$n$ vertices can be partitioned into $O(n)$ cycles and single edges. Buci\'c and
+Montgomery proved the bound $O(n\log^\star n)$. Their argument works in rounds:
+each round finds well-connected subgraphs, called expanders, turns the edges
+inside them into few cycles, and passes the remaining edges, which form a much
+sparser graph, to the next round. There are about $\log^\star n$ rounds, and
+each costs $O(n)$. This paper gives a complete account, in reorganised and
+simplified form, of a proof of the full conjecture claimed by Coffey. The key
+observation is that an expander found in one round is far denser than
+everything that remains two rounds later. So it can lend a few of its edges to
+every later round, where they serve as connections. With this help the total
+cost over all rounds is $O(n)$, instead of $O(n)$ per round. The few edges
+that still cannot be closed into cycles are compressed into auxiliary graphs
+with at most $n/4$ vertices in total, and these are decomposed by induction.
 \end{abstract}
 
 \tableofcontents
@@ -138,7 +140,8 @@ every such graph can be \emph{covered} by $n-1$ cycles and edges. For the
 decomposition problem, Conlon, Fox and Sudakov~\cite{CFS} proved
 $f(G)=O(n\log\log n)$, and Buci\'c and Montgomery~\cite{BM} proved
 $f(G)=O(n\log^\star n)$, where $\log^\star$ is the iterated logarithm. This
-paper presents a proof of the conjecture.
+paper gives a complete exposition of a claimed proof of the conjecture; see the
+note on its status below.
 
 \begin{theorem}\label{thm:main}
 There is an absolute constant $C$ such that $f(G)\le Cn$ for every graph $G$ on
@@ -168,33 +171,51 @@ ingredient.
 
 This subsection explains the proof informally. Nothing in it is used later.
 
+\paragraph{Expanders.} The basic tool is a weak but robust notion of a
+well-connected graph. Roughly, a graph on $N$ vertices is an \emph{expander}
+if every set $U$ of at most $2N/3$ vertices has at least $|U|/\log^2N$
+neighbours outside $U$, and this stays true even after many edges at $U$ are
+deleted; \cref{def:expander} gives the precise form. Such expansion is weak
+(``sublinear''), but it has two advantages. First, every graph can be cut into
+expanders that overlap little, at the price of deleting a few edges
+(\cref{sec:splitting}). Second, expanders are richly connected. They contain
+long cycles (\cref{lem:longcycle}). And given many pairs of vertices, an
+expander contains edge-disjoint paths joining all the pairs, even if the
+interior of every path must lie in a prescribed sparse random set of vertices
+(\cref{lem:link}).
+
+This second property is how all our cycles are made. To turn a path $P$ into a
+cycle, we join its two ends by a \emph{connector}, a path through an expander
+whose interior lies in a random set that $P$ avoids. The connector then meets
+$P$ only at its ends, so $P$ and the connector together form a cycle.
+
 \paragraph{Rounds.} The method of Buci\'c and Montgomery~\cite{BM} runs in
 rounds. A round starts from a graph $G_r\subseteq G$, on all $n$ vertices of
 $G$, with average degree $d=d_r$; write $\lambda=\log d$. First one removes
 cycles of length at least $d\lambda^2$, one at a time; there are at most
 $n/(2\lambda^2)$ of them. The graph that remains has no long cycles, so all its
 expanding subgraphs are small, since expanders contain long cycles. One then
-splits it into robust sublinear expanders, called \emph{pieces}, of order at
-most $d^2$, deleting a few edges along the way. The deleted edges, together
+splits it into expanders, called \emph{pieces}, of order at most $d^2$, deleting a few edges along the way. The deleted edges, together
 with the edges of a few small leftover parts, form the graph $G_{r+1}$ of the
 next round, whose average degree is only polylogarithmic in~$d$. After about
 $\log^\star n$ rounds the remaining graph has bounded average degree, and its
 edges are simply taken as single edges.
 
-In~\cite{BM} the edges inside the pieces of each round are decomposed using the
-connectivity of expanders, at a cost proportional to the total order of the
-pieces, which is $\Theta(n)$ per round. This is where the factor $\log^\star n$
-comes from: a vertex can lie in pieces of every round, and it is paid for every
-time.
+In~\cite{BM} the edges inside a piece $X$ are decomposed into paths, and the
+paths are closed into cycles by connectors inside $X$. This costs $O(|X|)$
+cycles and edges. Summed over the pieces of a round, the cost is $\Theta(n)$ per
+round. This is where the factor $\log^\star n$ comes from: a vertex can lie in
+pieces of every round, and it is paid for every time.
 
 \paragraph{Anchors.} The key observation, due to Coffey~\cite{Cof}, is that
 earlier pieces are vastly richer than anything that happens two rounds later.
-A piece of round $r$ is an $s_r$-expander with $s_r\approx\lambda_r^{50}$, so
-all its degrees exceed $\lambda_r^{50}$. A piece of round $\ell\ge r+2$ has at
-most $M_\ell\approx d_\ell^2$ vertices, and two rounds of polylogarithmic decay
+Every vertex of a piece of round $r$ has degree more than about
+$\lambda_r^{50}$ inside the piece, and the piece stays an expander after
+deleting up to $\lambda_r^{50}$ edges per vertex. A piece of round $\ell\ge r+2$
+has at most $M_\ell\approx d_\ell^2$ vertices, and two rounds of polylogarithmic decay
 give $M_\ell\le(\log\lambda_r)^{O(1)}$ (\cref{lem:scales}). So a piece of round
 $r$ can set aside, for each later round, a random slice of its edges which is
-still a robust expander with degrees far larger than anything in that round.
+still an expander, with degrees far larger than anything in that round.
 One round back is not enough, because a piece of round $r+1$ may have up to
 $\lambda_r^{110}$ vertices.
 
@@ -260,12 +281,14 @@ closes the cherry into a cycle. The vertex $y$ is fresh.}
 piece, because such edges were assigned to that piece when it was formed. So if
 $u$ is a port with anchor $Y$, every edge $ux$ of round $\ell$ leaves $Y$. Fix
 $Y$ and a vertex $x\notin Y$, and pair up the edges from $x$ to ports anchored at
-$Y$. This gives \emph{cherries} $u\,x\,v$ with both ends in $Y$. The edges lent
-by $Y$ can join the last vertex of one cherry to the first vertex of the next,
-and so chain many vertex-disjoint cherries into a single long cycle
-(\cref{fig:cherries}). In this way almost all edges at ports turn into few
-cycles. What remains is at most one edge between each non-port $x$ and the
-ports of each anchor.
+$Y$. This gives \emph{cherries} $u\,x\,v$ with both ends in
+$Y$. Closing each cherry by its own connector inside $Y$ would cost one cycle
+for every two edges, which is far too many. Instead, connectors made of edges
+lent by $Y$ join the last vertex of one cherry to the first vertex of the next,
+and so chain $K$ vertex-disjoint cherries into a single cycle
+(\cref{fig:cherries}). With $K$ large, almost all edges at ports turn into few
+cycles. What remains is at most one unpaired edge between each non-port $x$ and
+the ports of each anchor.
 
 \paragraph{The quotient.} A typical leftover edge joins a hub $h$ to a port $u$
 with anchor $Y$. We extend it by a private edge $uw$ lent by $Y$ to a vertex $w$
@@ -274,14 +297,19 @@ $hw$ of an auxiliary graph $Q_\ell$ whose vertices are hubs and pool vertices.
 Leftover edges between two ports are treated in the same way, with a pool
 vertex at each end. A cycle of $Q_\ell$ lifts to a cycle of $G$, and a single
 edge of $Q_\ell$ lifts to at most two edges of $G$ (\cref{fig:quotient}).
-Since hubs are rare and pools are sparse, the graphs $Q_\ell$ have at most $n/4$
-vertices in total, so we can decompose them by induction on the number of
-vertices.
+The point is that $Q_\ell$ may have many edges but has few vertices: hubs are
+rare and pools are sparse, so the graphs $Q_\ell$ have at most $n/4$ vertices in
+total. By induction, a graph on $q$ vertices decomposes into at most $Cq$ cycles
+and edges, however many edges it has. Lifting at most doubles the number of
+objects, so the leftover edges cost at most $2C\cdot n/4=Cn/2$, and if
+everything else costs at most $C_0n$, then $f(G)\le C_0n+Cn/2\le Cn$ for
+$C=2C_0$. This is \cref{thm:reduction} below.
 
-\paragraph{Clearing.} Each piece is itself a robust expander, so it can absorb
-all edges among any chosen set $P$ of its vertices into $O(|P|)$ cycles and
-edges (\cref{lem:clear}). We use this for the hubs and fresh vertices, and for a
-few ports that we sacrifice for technical reasons.
+\paragraph{Clearing.} Each piece is itself an expander, so it can absorb all
+edges among any chosen set $P$ of its vertices into $O(|P|)$ cycles and edges,
+using connectors inside the piece (\cref{lem:clear}). We use this for the hubs
+and fresh vertices, and for a few unlucky ports that we sacrifice because the
+random choices made for them failed.
 
 \paragraph{Building forwards, decomposing backwards.} All rounds are
 constructed first. The decomposition then goes through the rounds in reverse
@@ -547,7 +575,10 @@ applied to the martingale $-Z_i$, now gives the bound.
 
 \subsection{Robust sublinear expanders}
 
-Throughout the paper we fix
+In an expander in our sense, every set $U$ of at most two thirds of the
+vertices has at least a $1/\log^2$ fraction of $|U|$ as neighbours outside $U$
+(``sublinear'' expansion), even after up to $s$ edges per vertex of $U$ are
+deleted (``robust'' expansion). Throughout the paper we fix
 \[
 \eps=1/32.
 \]
@@ -693,7 +724,8 @@ They meet in the \emph{separator} $B$, both have fewer than $N$ vertices, and
 $E(H)$ is the disjoint union of $E(H_1)$, $E(H_2)$ and $F$ (\cref{fig:split}).
 
 \begin{proof}
-Choose $U$ and $F'$ with $1\le|U|\le2N/3$, $|F'|\le s|U|$ and
+Since $H$ is not an $s$-expander, there are $U$ and $F'$ with $1\le|U|\le2N/3$,
+$|F'|\le s|U|$ and
 $|\NN_{H-F'}(U)|<\eps|U|/\log^2N$. Let $S=\NN_{H-F'}(U)$ and
 $C'=V(H)\setminus(U\cup S)$. All edges between $U$ and $C'$ lie in $F'$, so
 $F_0=E_H(U,C')$ has at most $s|U|$ edges. Let $U^+$ be the set of vertices
@@ -871,12 +903,9 @@ For a real number $d\ge D$ we use the parameters
 \lambda=\log d,\qquad M=\lceil d^2\rceil,\qquad s=\lceil\lambda^{50}\rceil,
 \qquad \tau=\lceil\lambda^{53}\rceil,\qquad m=\lceil\lambda^{54}\rceil,
 \]
-with the meanings shown in \cref{tab:params}. The exponents are not optimised.
-What matters are the relations between them, which are collected in
-\cref{tab:requirements}: the pieces must be robust enough to lend reservoirs and
-to clear vertices ($s$ large), the cut threshold must be compatible with the
-splitting step but negligible compared with the pieces ($s\log^2M\ll\tau\ll m$),
-and the next degree, about $s\lambda+m$, must still be polylogarithmic.
+with the meanings shown in \cref{tab:params}. The exponents are not optimised;
+\cref{tab:requirements} at the end of this subsection lists what the proof
+needs from them.
 
 \begin{table}[h]
 \centering\small
@@ -896,28 +925,7 @@ $m_r$ & $\lceil\lambda_r^{54}\rceil$ & minimum order of a piece of round $r$\\
 \label{tab:params}
 \end{table}
 
-\begin{table}[h]
-\centering\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}p{0.42\textwidth}p{0.5\textwidth}@{}}
-\toprule
-requirement & where it is used\\
-\midrule
-$\tau\ge256s\log^2M$ & splitting steps of round $r$ are legal (\cref{lem:split})\\
-$\frac{56}3s\log M+\frac43m\le\lambda^{55}$ & the next degree is $d_{r+1}\le\lambda_r^{55}$, see~\ref{it:H-degree}\\
-$\tau/m\le2/\lambda$ and $\log m\ge\mu$ & hubs and crowding are summable over rounds (\cref{lem:bookkeeping})\\
-$s/4\ge\log^{40}M$ & a piece can clear vertices with its own edges (\cref{lem:clear})\\
-$s\lambda^{-4}\ge\lambda^{46}\gg M_\ell^{13}\log^{18}M$ for $\ell\ge r+2$ & lent edges link through sparse slots (\cref{lem:good})\\
-$s\lambda^{-5}\gg M_\ell^{15}$ for $\ell\ge r+2$ & donor sets are large (\cref{lem:deficient})\\
-$m\ge M_\ell$ for $\ell\ge r+2$ & bad anchors are rare compared with slots (\cref{lem:Omega})\\
-\bottomrule
-\end{tabular}
-\caption{What the proof needs from the exponents. Here $\lambda=\lambda_r$,
-$\mu=\mu_r$, and $M_\ell\le(55\mu_r)^{111}$ by \cref{lem:scales}; the last
-three requirements hold because $\lambda_r=2^{\mu_r}$ is exponentially larger
-than any fixed power of $\mu_r$.}
-\label{tab:requirements}
-\end{table}
+
 
 \paragraph{Construction.} Let $G_1=G$. For $r=1,2,\dots$ let
 $d_r=2e(G_r)/n$. If $d_r<D$ we stop and put $R=r-1$. Otherwise we carry out
@@ -943,6 +951,17 @@ that were not assigned, on the vertex set $V(G)$.
 \end{enumerate}
 We write $\cY_r$ for the set of pieces of round $r$, and $\sh_r(Y)$ for the
 shared vertices of $Y\in\cY_r$ in $\cT_r$.
+
+Each step has a purpose. Removing long cycles in~\ref{it:R1} forces every
+expander that remains to be small, at most $M_r$ vertices, because expanders
+contain long cycles (see \ref{it:H-size} below). The splitting in~\ref{it:R2} has
+two stages because of the deleted edges: the first stage deletes nothing and
+cuts the graph into parts of order at most $M_r$, so the second stage, which
+does delete edges, works inside small parts and deletes only $O(s_r\log M_r)$
+edges per vertex rather than $O(s_r\log n)$; see~\ref{it:H-degree}. The assignment
+in~\ref{it:R3} makes the rounds \emph{separated}: no later round ever sees an
+edge with both ends in an earlier piece; see~\ref{it:H-sep}. This is what makes
+cherries possible.
 
 \begin{lemma}[The hierarchy]\label{lem:hierarchy}
 For every round $r\le R$:
@@ -1031,6 +1050,37 @@ once per pair of rounds, are summable because the parameters grow like a tower
 towards earlier rounds. Part~\ref{it:sc-two} is why anchors are taken two rounds
 back: $M_{r+1}$ may be as large as $\lambda_r^{110}$, but $M_{r+2}$ is only
 polylogarithmic in $\lambda_r$.
+
+\paragraph{Where the exponents come from.} The relations between the
+parameters that the proof uses are collected in \cref{tab:requirements}. In
+short: the pieces must be robust enough to lend edges to later rounds and to
+clear vertices ($s$ large); the cut threshold must be large enough for the
+splitting step but negligible compared with the pieces
+($s\log^2M\ll\tau\ll m$); and the next degree, about $s\lambda+m$, must still be
+polylogarithmic.
+
+\begin{table}[h]
+\centering\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.42\textwidth}p{0.5\textwidth}@{}}
+\toprule
+requirement & where it is used\\
+\midrule
+$\tau\ge256s\log^2M$ & splitting steps of round $r$ are legal (\cref{lem:split})\\
+$\frac{56}3s\log M+\frac43m\le\lambda^{55}$ & the next degree is $d_{r+1}\le\lambda_r^{55}$, see~\ref{it:H-degree}\\
+$\tau/m\le2/\lambda$ and $\log m\ge\mu$ & hubs and crowding are summable over rounds (\cref{lem:bookkeeping})\\
+$s/4\ge\log^{40}M$ & a piece can clear vertices with its own edges (\cref{lem:clear})\\
+$s\lambda^{-4}\ge\lambda^{46}\gg M_\ell^{13}\log^{18}M$ for $\ell\ge r+2$ & lent edges link through sparse slots (\cref{lem:good})\\
+$s\lambda^{-5}\gg M_\ell^{15}$ for $\ell\ge r+2$ & donor sets are large (\cref{lem:deficient})\\
+$m\ge M_\ell$ for $\ell\ge r+2$ & bad anchors are rare compared with slots (\cref{lem:Omega})\\
+\bottomrule
+\end{tabular}
+\caption{What the proof needs from the exponents. Here $\lambda=\lambda_r$,
+$\mu=\mu_r$, and $M_\ell\le(55\mu_r)^{111}$ by \cref{lem:scales}; the last
+three requirements hold because $\lambda_r=2^{\mu_r}$ is exponentially larger
+than any fixed power of $\mu_r$.}
+\label{tab:requirements}
+\end{table}
 
 \subsection{Roles}\label{sec:roles}
 
@@ -1172,10 +1222,11 @@ bounded-degree bipartite subgraph between $W$ and its complement certifies
 this, and a Bernstein inequality makes it hold with very high probability.
 Exposing $V$ in $k=O(L/\alpha)$ independent batches, the ball around a set
 grows by a factor $1+\alpha/16$ per batch until it covers most of the graph.
-\item \emph{Union bound.} The growth fails with probability $N^{-\Omega(|A|)}$
-only if the starting set $A$ is \emph{well-expanding}, with $|\NN(A)|\ge\theta|A|$.
-Every set contains a large well-expanding subset~\cite[Proposition~18]{BM}, so
-this suffices.
+\item \emph{Union bound.} If the starting set $A$ is \emph{well-expanding},
+with $|\NN(A)|\ge\theta|A|$ for a suitable $\theta$, the growth fails with
+probability at most $N^{-\Omega(|A|)}$. This is small enough for a union bound
+over all such $A$. Every set contains a large well-expanding
+subset~\cite[Proposition~18]{BM}, so this suffices.
 \item \emph{Amplification.} Steps (3) and (4) tolerate only about $|U|/L^{O(1)}$
 deleted edges, while step (1) needs tolerance of about $t|U|L^{O(1)}$. Split the
 edges of $H$ at random into $K$ colours, each again an expander by
@@ -1222,6 +1273,13 @@ inside the next level (\cref{fig:clear}). Closing paths through
 path-connecting random sets is the method of~\cite{BM}. Combining it with a
 vortex is due to Coffey~\cite{Cof}. What survives all $k$ steps lives on the
 tiny set $P_k$ and is decomposed by \cref{lem:egp}.
+
+Two points need care. A connector must avoid the path it closes, so each path
+is given a \emph{phase} $c\in\{1,2\}$: it avoids the random set $V_{j,c}$
+through which its connector will run. And the linking lemma can join only
+pairs in which no vertex appears too often, so the ends of the paths must be
+spread out. This is why each vertex $w$ extends its paths only into a fixed set
+of \emph{outlets}, chosen so that no vertex is an outlet of too many others.
 
 \begin{proof}
 Let $L=\log N$, and assume $P\ne\varnothing$.
@@ -1388,8 +1446,13 @@ handled in later steps.}
 \subsection{Closing cherries}
 
 The second lemma chains cherries into cycles. In the application the ports are
-the ports of one round, the classes are given by their anchors, and the
-reservoirs are edges lent by the anchors.
+the ports of one round, the classes are given by their anchors, and the graphs
+$R_{Y,j}$ consist of edges lent by the anchors. Informally, it says: if every
+edge to be decomposed has a port end, if edges at a port leave its class, and if
+each class has $K$ edge-disjoint reservoirs linking through $K$ disjoint slots,
+then all edges except at most one per pair (non-port, class) can be covered by
+about $\kappa_Y/2+2\Delta$ cycles per class plus $|E'|/(2K)$ cycles in total.
+Here $\kappa_Y$ measures how many ports of class $Y$ can share a neighbour.
 
 \begin{lemma}[Cherries]\label{lem:cherry}
 Let $E'$ be a set of edges and let $\Pi$ be a set of vertices, called
@@ -1786,6 +1849,14 @@ multiplicity $M_\ell$.
 Otherwise it is \emph{bad}.
 \end{definition}
 
+The numbers are chosen as follows. There are $K=M_\ell^2$ closing colours for
+round $\ell$, so that \cref{lem:cherry} costs only $|E'|/(2K)\le n/(2M_\ell)$
+beyond the crowding terms. Each slot set is a random set of density
+$M_\ell^{-4}$, sparse enough that a given port lies in some slot with
+probability only $M_\ell^{-2}$, yet dense enough for the linking lemma, because
+the lent graphs have degrees about $\lambda_r^{46}$, far larger than any power
+of $M_\ell$.
+
 \begin{lemma}\label{lem:good}
 Every piece $Y$ is bad with probability at most $|Y|^{-2}$.
 \end{lemma}
@@ -1824,7 +1895,9 @@ most $\sum_\ell q_\ell<1$. Let $W_{\ell,r,\sigma}$ be the set of vertices with
 label $(\ell,r,\sigma)$, let $W_\ell^\sigma=\bigcup_rW_{\ell,r,\sigma}$ and
 $W_\ell=W_\ell^-\cup W_\ell^+$, and for $w\in W_\ell$ let $r(w)$ be the second
 coordinate of its label. Every vertex lies in $W_\ell$ with probability less
-than $q_\ell$.
+than $q_\ell$. So the pools are very sparse, which keeps the quotient small. Yet
+every port still has many donor candidates, because its anchor gives it about
+$\lambda_r^{46}$ donor edges (\cref{lem:deficient}).
 
 The pool of round $\ell$ is split by the round $r$ of the anchors it serves.
 The reason is condition~\eqref{eq:beta} of \cref{lem:quotient}: a pool vertex
@@ -1998,8 +2071,11 @@ cycles is at most
 \]
 where $Y$ runs over the pieces of rounds at most $\ell-2$.
 
-\paragraph{Step 3: pay.} Pay for every edge of $J_\ell$ with an end in
-$\Lost_\ell\cup W_\ell\cup\Def_\ell$. Then, at every fresh vertex $x\notin
+\paragraph{Step 3: pay.} Some leftover edges cannot enter the quotient: edges
+at lost ports, which have no usable anchor; edges at deficient ports, which have
+too few donors; and edges at pool vertices, which are reserved as vertices of
+the quotient and must not also play another role. Pay for every edge of
+$J_\ell$ with an end in $\Lost_\ell\cup W_\ell\cup\Def_\ell$. Then, at every fresh vertex $x\notin
 W_\ell$, pair up the remaining edges of $J_\ell$ at $x$ into links $u\,x\,v$,
 and pay for the leftover edge if their number is odd. Since $J_\ell$ is simple,
 $u\ne v$.
