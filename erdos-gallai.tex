@@ -22,8 +22,7 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 \crefname{claim}{Claim}{Claims}
-\newtheorem{aclaim}{Claim}
-\renewcommand{\theaclaim}{A.\arabic{aclaim}}
+\newtheorem{aclaim}[theorem]{Claim}
 \crefname{aclaim}{Claim}{Claims}
 \numberwithin{equation}{section}
 \numberwithin{figure}{section}
@@ -96,10 +95,14 @@
 
 \begin{center}
 \fbox{\parbox{0.9\textwidth}{\small\textbf{Status.} This write-up is entirely
-AI-generated. At the time of posting (1~October 2026) no human has read or
-understood this proof. It is meant as a stopgap: an intermediate artifact
-between Coffey's proof claim and a final proof that humans have read, understood
-and digested. It should not be cited as an established result.}}
+AI-generated. It expounds a proof claimed by Ryan Coffey~\cite{Cof}. An earlier
+condensed draft was produced by another AI system. The present text, its
+figures and its checks are by Claude Opus 5.5, with independent AI reviews. At
+the time of posting (1~October 2026) no human has read or understood this
+proof, and it has not been refereed or formally verified. It is meant as a
+stopgap: an intermediate artifact between Coffey's proof claim and a final
+proof that humans have read, understood and digested. It should not be cited as
+an established result.}}
 \end{center}
 
 \begin{abstract}
@@ -148,21 +151,13 @@ There is an absolute constant $C$ such that $f(G)\le Cn$ for every graph $G$ on
 $n$ vertices.
 \end{theorem}
 
-\paragraph{Provenance and status.} The argument below is a reorganisation and
+\paragraph{Provenance.} The argument below is a reorganisation and
 simplification of a proof claimed by Coffey~\cite{Cof}, which in turn builds on
 the method of Buci\'c and Montgomery~\cite{BM}. Coffey reports that his proof
 was developed with substantial help from an AI system and that it comes with a
-formalisation in Lean. That formalisation concerns his original manuscript and
-not the version given here.
-
-This write-up is entirely AI-generated. An earlier condensed draft was produced
-by another AI system, and the present text was written by Claude Opus 5.5,
-which also produced all figures and checked the argument, with the help of
-independent AI reviews. At the time of posting, 1~October 2026, the proof has
-not been read or understood by any human. It has not been refereed or formally
-verified. Its purpose is to serve as a stopgap: an intermediate artifact
-between Coffey's proof claim and a final proof that humans have read,
-understood and digested. \Cref{sec:sources} lists the source of every
+formalisation in Lean. That formalisation concerns his original manuscript, not
+the version given here, which, as stated in the box above, is AI-written and
+has not yet been read by any human. \Cref{sec:sources} lists the source of every
 ingredient.
 
 % ---------------------------------------------------------------------
@@ -196,7 +191,7 @@ cycles of length at least $d\lambda^2$, one at a time; there are at most
 $n/(2\lambda^2)$ of them. The graph that remains has no long cycles, so all its
 expanding subgraphs are small, since expanders contain long cycles. One then
 splits it into expanders, called \emph{pieces}, of order at most $d^2$, deleting a few edges along the way. The deleted edges, together
-with the edges of a few small leftover parts, form the graph $G_{r+1}$ of the
+with the edges of a few small parts, form the graph $G_{r+1}$ of the
 next round, whose average degree is only polylogarithmic in~$d$. After about
 $\log^\star n$ rounds the remaining graph has bounded average degree, and its
 edges are simply taken as single edges.
@@ -211,29 +206,34 @@ pieces of every round, and it is paid for every time.
 earlier pieces are vastly richer than anything that happens two rounds later.
 Every vertex of a piece of round $r$ has degree more than about
 $\lambda_r^{50}$ inside the piece, and the piece stays an expander after
-deleting up to $\lambda_r^{50}$ edges per vertex. A piece of round $\ell\ge r+2$
-has at most $M_\ell\approx d_\ell^2$ vertices, and two rounds of polylogarithmic decay
-give $M_\ell\le(\log\lambda_r)^{O(1)}$ (\cref{lem:scales}). So a piece of round
-$r$ can set aside, for each later round, a random slice of its edges which is
-still an expander, with degrees far larger than anything in that round.
-One round back is not enough, because a piece of round $r+1$ may have up to
-$\lambda_r^{110}$ vertices.
+deleting up to $\lambda_r^{50}$ edges per vertex (the exponents are chosen in
+\cref{sec:rounds}). A piece of round $\ell\ge r+2$ has at most
+$M_\ell\approx d_\ell^2$ vertices, and two rounds of polylogarithmic decay give
+$M_\ell\le(\log\lambda_r)^{O(1)}$ (\cref{lem:scales}). So a piece $Y$ of round
+$r$ can set aside, for each round $\ell\ge r+2$, small random slices of its
+edges, called \emph{reservoirs}. Each reservoir is still an expander, with
+degrees far larger than anything in round $\ell$, and round $\ell$ borrows from
+it. The remaining half of the edges of $Y$ are its \emph{own} edges, which $Y$
+keeps for itself. One round back is not enough, because a piece of round $r+1$
+may have up to $\lambda_r^{110}$ vertices.
 
 Fix a round $\ell$. A vertex of a piece of round $\ell$ plays one of three roles
 (\cref{fig:roles}):
 \begin{itemize}[leftmargin=2em,itemsep=2pt]
-\item a \emph{hub} lies in at least two pieces of round $\ell$. Hubs are rare:
+\item a \emph{hub} lies in at least two pieces of round $\ell$. Hubs are rare,
+because they lie in the separators of the splitting, and separators are tiny:
 summed over all rounds, the number of incidences between hubs and pieces is
 $o(n)$;
 \item a \emph{port} lies in exactly one piece of round $\ell$, and also lies in
 a piece of some round $r\le\ell-2$, which we fix and call its \emph{anchor};
 \item a \emph{fresh} vertex lies in exactly one piece of round $\ell$ and has no
 anchor. Two rounds after a vertex first appears in a piece, it has an anchor,
-so every vertex is fresh in at most two rounds.
+so every vertex is fresh in at most two rounds. A single round, however, may
+have $\Theta(n)$ fresh vertices.
 \end{itemize}
-Hubs and fresh vertices are dealt with inside their own piece at a cost of
-$O(1)$ each, which is $O(n)$ in total. The main work is to deal with ports at a
-total cost of $o(n)$ over all rounds.
+The edges of round $\ell$ are decomposed in four steps: clearing, closing
+cherries, pairing at fresh vertices, and the quotient. We describe them in this
+order.
 
 \begin{figure}[t]
 \centering
@@ -272,51 +272,79 @@ total cost of $o(n)$ over all rounds.
 \caption{Roles of vertices in round $\ell$. The hub $h$ lies in two pieces of
 round $\ell$. The ports $u,v$ lie only in $X$, and both have the old piece $Y$ as
 their anchor. The edges $xu,xv$ of round $\ell$ leave $Y$, and together they form
-a cherry $u\,x\,v$ with both ends in $Y$. A path of edges lent by $Y$ (dashed)
-closes the cherry into a cycle. The vertex $y$ is fresh.}
+a cherry $u\,x\,v$ with both ends in $Y$ (see Step~2 below). A path of edges
+lent by $Y$ (dashed) closes the cherry into a cycle. The vertex $y$ is fresh.}
 \label{fig:roles}
 \end{figure}
 
-\paragraph{Cherries.} An edge of round $\ell$ never has both ends in an earlier
-piece, because such edges were assigned to that piece when it was formed. So if
-$u$ is a port with anchor $Y$, every edge $ux$ of round $\ell$ leaves $Y$. Fix
-$Y$ and a vertex $x\notin Y$, and pair up the edges from $x$ to ports anchored at
-$Y$. This gives \emph{cherries} $u\,x\,v$ with both ends in
-$Y$. Closing each cherry by its own connector inside $Y$ would cost one cycle
-for every two edges, which is far too many. Instead, connectors made of edges
-lent by $Y$ join the last vertex of one cherry to the first vertex of the next,
-and so chain $K$ vertex-disjoint cherries into a single cycle
+\paragraph{Step 1: clearing.} Each piece $X$ is an expander, so it can absorb
+all edges among any chosen set $P$ of its vertices into $O(|P|)$ cycles and
+edges, using connectors made of its own edges (\cref{lem:clear}). We clear the
+hubs and the fresh vertices of $X$ in this way. Hubs are rare and every vertex
+is fresh in at most two rounds, so over all rounds this costs $O(n)$. Afterwards
+every remaining edge of round $\ell$ has an end at a port.
+
+\paragraph{Step 2: closing cherries.} An edge of round $\ell$ never has both
+ends in an earlier piece, because such edges were assigned to that piece when it
+was formed. So if $u$ is a port with anchor $Y$, every edge $ux$ of round $\ell$
+leaves $Y$. Fix $Y$ and a vertex $x\notin Y$, and pair up the edges from $x$ to
+ports anchored at $Y$. This gives \emph{cherries} $u\,x\,v$ with centre $x$ and
+both ends in $Y$. Closing each cherry by its own connector inside $Y$ would cost
+one cycle for every two edges, which is far too many. Instead, connectors from
+the reservoirs of $Y$ join the last vertex of one cherry to the first vertex of
+the next, and so chain $K$ vertex-disjoint cherries into a single cycle
 (\cref{fig:cherries}). With $K$ large, almost all edges at ports turn into few
-cycles. What remains is at most one unpaired edge between each non-port $x$ and
-the ports of each anchor.
+cycles. What remains is at most one unpaired edge from each hub or fresh
+vertex $x$ to the ports of each anchor, together with some edges between two
+ports. So the leftover edges are of three kinds: hub--port, fresh--port and
+port--port.
 
-\paragraph{The quotient.} A typical leftover edge joins a hub $h$ to a port $u$
-with anchor $Y$. We extend it by a private edge $uw$ lent by $Y$ to a vertex $w$
-of a sparse random \emph{pool}, and regard the path $h\,u\,w$ as a single edge
-$hw$ of an auxiliary graph $Q_\ell$ whose vertices are hubs and pool vertices.
-Leftover edges between two ports are treated in the same way, with a pool
-vertex at each end. A cycle of $Q_\ell$ lifts to a cycle of $G$, and a single
-edge of $Q_\ell$ lifts to at most two edges of $G$ (\cref{fig:quotient}).
-The point is that $Q_\ell$ may have many edges but has few vertices: hubs are
-rare and pools are sparse, so the graphs $Q_\ell$ have at most $n/4$ vertices in
-total. By induction, a graph on $q$ vertices decomposes into at most $Cq$ cycles
-and edges, however many edges it has. Lifting at most doubles the number of
-objects, so the leftover edges cost at most $2C\cdot n/4=Cn/2$, and if
-everything else costs at most $C_0n$, then $f(G)\le C_0n+Cn/2\le Cn$ for
-$C=2C_0$. This is \cref{thm:reduction} below.
+\paragraph{Step 3: pairing at fresh vertices.} A fresh vertex $x$ may still have
+many leftover edges, one to the ports of each of many anchors. We pair them up
+at $x$ into paths $u\,x\,v$ between two ports, and pay for one edge if their
+number is odd. This costs at most one edge per fresh vertex, so $O(n)$ over all
+rounds. These paths, and the leftover edges between two ports, are the
+\emph{links}. Fresh vertices have to disappear at this point, because there may
+be $\Theta(n)$ of them, far too many to become vertices of the small auxiliary
+graphs of the last step.
 
-\paragraph{Clearing.} Each piece is itself an expander, so it can absorb all
-edges among any chosen set $P$ of its vertices into $O(|P|)$ cycles and edges,
-using connectors inside the piece (\cref{lem:clear}). We use this for the hubs
-and fresh vertices, and for a few unlucky ports that we sacrifice because the
-random choices made for them failed.
+\paragraph{Step 4: the quotient.} What remains are \emph{hub edges} $hu$ from a
+hub to a port, and links between two ports. We extend every hub edge $hu$ by a
+private edge $uw$, lent by the anchor of $u$, to a vertex $w$ of a sparse random
+\emph{pool}, and regard the path $h\,u\,w$ as a single edge $hw$ of an auxiliary
+graph $Q_\ell$ whose vertices are hubs and pool vertices. Links are treated in
+the same way, with a pool vertex at each end. A cycle of $Q_\ell$ lifts to a
+cycle of $G$, and a single edge of $Q_\ell$ lifts to at most two edges of $G$
+(\cref{fig:quotient}). The point is that $Q_\ell$ may have many edges but has
+few vertices: hubs are rare and pools are sparse, so the graphs $Q_\ell$ have at
+most $n/4$ vertices in total. By induction, a graph on $q$ vertices decomposes
+into at most $Cq$ cycles and edges, however many edges it has, and lifting at
+most doubles the number of objects.
+
+\paragraph{The budget.} Together with the long cycles and the edges of the
+final sparse graph, these steps decompose $E(G)$. The objects are:
+\begin{itemize}[leftmargin=2em,itemsep=1pt]
+\item the edges of the final sparse graph, fewer than $Dn/2$, where $D$ is the
+average degree at which the rounds stop;
+\item $O(n)$ objects for clearing and pairing at fresh vertices;
+\item $o(n)$ objects for the long cycles, for clearing hubs, for closing
+cherries, and for a few unlucky ports for which the random choices fail and
+whose edges are cleared or paid for instead;
+\item at most $2C\cdot n/4=Cn/2$ objects for the lifted decompositions of the
+quotients.
+\end{itemize}
+The terms of the third kind are $o(n)$ in total, not just $o(n)$ per round,
+because the parameters grow like a tower towards earlier rounds, so quantities
+that decay with the parameters of a round are summable over all rounds
+(\cref{lem:scales}). If the first three kinds cost at most $C_0n$, then
+$f(G)\le C_0n+Cn/2\le Cn$ for $C=2C_0$. This is \cref{thm:reduction} below.
 
 \paragraph{Building forwards, decomposing backwards.} All rounds are
 constructed first. The decomposition then goes through the rounds in reverse
 order (\cref{fig:timeline}). So when a piece $Y$ is finally decomposed, every
 round that borrowed from $Y$ is finished. Only the edges that were actually
-borrowed are removed from $Y$. All other edges of $Y$, including unused lent
-edges, are decomposed together with its own edges.
+borrowed are removed from $Y$. All other edges of $Y$, including unused
+reservoir edges, are decomposed together with its own edges.
 
 \begin{figure}[t]
 \centering
@@ -394,19 +422,22 @@ $f(G)\le C_0n+2\sum_i2C_0|V(Q_i)|\le C_0n+C_0n$.
 % ---------------------------------------------------------------------
 
 \Cref{fig:deps} shows how the results depend on each other. \Cref{sec:prelim}
-fixes notation and collects the classical tools. \Cref{sec:hierarchy} builds
-the rounds and proves their structural properties. \Cref{sec:linking} states
-the linking lemma, which is behind every connection we make through an
-expander; its proof, an adaptation of the method of~\cite{BM}, is in
-\cref{app:linking}. \Cref{sec:three} proves three self-contained decomposition
-lemmas: clearing a set of vertices, closing cherries, and building the
-quotient. \Cref{sec:proof} puts everything together and proves
-\cref{thm:reduction}. \Cref{sec:sources} lists the sources.
+fixes notation, recalls three classical tools and defines expanders.
+\Cref{sec:hierarchy} builds the rounds and proves their structural properties.
+\Cref{sec:linking} states the linking lemma, which is behind every connection we
+make through an expander; its proof, an adaptation of the method of~\cite{BM},
+is in \cref{app:linking}, together with the two tools only it needs (Haxell's
+theorem and a Bernstein inequality). \Cref{sec:three} proves three
+self-contained decomposition lemmas: clearing a set of vertices, closing
+cherries, and building the quotient. \Cref{sec:proof} puts everything together
+and proves \cref{thm:reduction}; it ends with a list of what the proof needs
+from the exponents. \Cref{sec:sources} lists the sources.
 
 A reader who wants the main line of the argument can read \cref{sec:strategy},
 the statements in \cref{sec:hierarchy,sec:linking}, \cref{sec:three} and
-\cref{sec:proof}, and skip the proofs of \cref{sec:hierarchy} and the
-appendix.
+\cref{sec:proof}, and skip the appendix and most proofs of \cref{sec:hierarchy}.
+We recommend reading the short proof of \cref{lem:bookkeeping}, which shows why
+everything charged to the rounds adds up to $o(n)$.
 
 \begin{figure}[t]
 \centering
@@ -439,6 +470,7 @@ appendix.
   \draw[arr] (prob) -- (link);
   \draw[arr] (samp) -- (link);
   \draw[arr] (link) -- (clear);
+  \draw[arr] (samp.south) .. controls (9.0,0.55) and (5.0,0.6) .. (clear.east);
   \draw[arr] (hier) -- (red);
   \draw[arr] (clear) -- (red);
   \draw[arr] (cher) -- (red);
@@ -481,19 +513,7 @@ object.
 A path is \emph{through} a set $V$ if all its interior vertices lie in $V$.
 Its ends are unrestricted, and a single edge is a path through every set.
 
-\begin{definition}[Linking]\label{def:linking}
-Let $H$ be a graph, $V\subseteq V(H)$ and $t\ge1$. We say that $H$ \emph{links
-through $V$ with multiplicity $t$} if the following holds for every multiset
-$\cP$ of pairs of distinct vertices of $H$ in which every vertex lies in at most
-$t$ pairs, counted with multiplicity: there are pairwise edge-disjoint paths
-$P_\pi$, $\pi\in\cP$, in $H$, such that $P_\pi$ joins the two vertices of $\pi$
-and is through~$V$.
-\end{definition}
-
-This is the notion of path connectivity of~\cite[Definition~7]{BM}, without
-the bound on the lengths of the paths, which we never need.
-
-\subsection{Three classical facts}
+\subsection{Three classical tools}
 
 \begin{lemma}[Paths; Lov\'asz~\cite{Lov}, see {\cite[Corollary~22]{BM}}]\label{lem:lovasz}
 The edges of every graph can be decomposed into paths so that every vertex is
@@ -529,49 +549,11 @@ for.
 This is the classical bound $f(G)=O(n\log n)$, observed already by Erd\H{o}s
 and Gallai; see~\cite{CFS,BM}.
 
-\begin{theorem}[Haxell~\cite{Hax}]\label{thm:haxell}
-Let $h\ge1$ and let $\cA_1,\dots,\cA_q$ be families of sets of size at most $h$.
-Suppose that for every nonempty $I\subseteq[q]$ and every set $S$ with
-$|S|\le(2h-1)(|I|-1)$, some member of some $\cA_i$ with $i\in I$ is disjoint
-from $S$. Then there are pairwise disjoint sets $A_1\in\cA_1,\dots,A_q\in\cA_q$.
-\end{theorem}
-
-In Haxell's formulation, the families form a bipartite hypergraph in which each
-edge consists of one index $i$ together with a member of $\cA_i$, so edges have
-at most $r=h+1$ vertices, and the bound $(2r-3)(|I|-1)$ on transversals is the
-bound above.
-
-\subsection{Probability}
-
 \begin{lemma}[Chernoff bounds; see~{\cite[Theorems~2.1 and~2.8]{JLR}}]\label{lem:chernoff}
 Let $X$ be a sum of independent indicator variables and $0<\delta\le1$. If
 $\E X\ge\mu$ then $\Pr(X\le(1-\delta)\mu)\le e^{-\delta^2\mu/2}$, and if
 $\E X\le\mu$ then $\Pr(X\ge(1+\delta)\mu)\le e^{-\delta^2\mu/3}$.
 \end{lemma}
-
-We also need a Bernstein-type inequality for functions of independent bits.
-It follows by applying Freedman's martingale inequality~\cite{Fre} to the
-exposure martingale; see also~\cite{McD}.
-
-\begin{lemma}[Bernstein inequality for bounded differences]\label{lem:freedman}
-Let $\xi_1,\dots,\xi_k$ be independent $\{0,1\}$-valued random variables with
-$\Pr(\xi_i=1)=p_i$, and let $Z=\phi(\xi_1,\dots,\xi_k)$, where changing $\xi_i$
-alone changes $\phi$ by at most $c_i\le c$. Put
-$\sigma^2=\sum_ip_i(1-p_i)c_i^2$. Then for all $x>0$,
-\[
-\Pr(Z\le\E Z-x)\le\exp\Bigl(-\frac{x^2}{2(\sigma^2+cx/3)}\Bigr).
-\]
-\end{lemma}
-
-\begin{proof}
-Let $Z_i=\E[Z\mid\xi_1,\dots,\xi_i]$. Given $\xi_1,\dots,\xi_{i-1}$, let
-$g(y)=\E[Z\mid\xi_1,\dots,\xi_{i-1},\xi_i=y]$. By independence $g(1)-g(0)$ is
-an average of differences of $\phi$, so $|g(1)-g(0)|\le c_i$. Hence the
-martingale difference $Z_i-Z_{i-1}=g(\xi_i)-\E g(\xi_i)$ is bounded by $c$ in
-absolute value and has conditional variance
-$p_i(1-p_i)(g(1)-g(0))^2\le p_i(1-p_i)c_i^2$. Freedman's inequality~\cite{Fre},
-applied to the martingale $-Z_i$, now gives the bound.
-\end{proof}
 
 \subsection{Robust sublinear expanders}
 
@@ -700,8 +682,9 @@ into two smaller graphs that overlap only in a small separator. Repeating this
 gives a decomposition into expanders. This is the method of Buci\'c and
 Montgomery~\cite[Lemma~14]{BM}. Coffey~\cite{Cof} added a rule that moves
 vertices with many deleted edges into the separator. This makes the deleted
-edges a thin cut, which is property~\ref{it:split-thin} below; it is what later
-keeps the crowding of anchors small (\cref{lem:bookkeeping}\ref{it:bk-crowd}).
+edges a thin cut, which is property~\ref{it:split-thin} below. Later it bounds
+how many ports of one anchor a single vertex can see
+(\cref{lem:bookkeeping}\ref{it:bk-crowd}).
 
 \begin{lemma}[A splitting step]\label{lem:split}
 Let $s\ge0$ and $\tau>0$, and let $H$ be a graph on $N\ge2$ vertices which is
@@ -839,6 +822,12 @@ $h\in Y$.
 \end{enumerate}
 \end{lemma}
 
+The idea is to charge the separator $B$ of each split, and its deleted edges,
+to the vertices of the side $A$. A vertex can be charged repeatedly, but each
+time by a node at most $3/4$ as large as the previous one, so the charges to it
+form a convergent series. Since a shared vertex lies in several leaves, we
+charge pairs (leaf, vertex), called copies, rather than vertices.
+
 \begin{proof}
 For every split of a node $H$, with parts $A,B,C$, and every $a\in A$, choose a
 leaf below the first child that contains $a$, and call the pair (leaf, $a$) a
@@ -904,8 +893,8 @@ For a real number $d\ge D$ we use the parameters
 \qquad \tau=\lceil\lambda^{53}\rceil,\qquad m=\lceil\lambda^{54}\rceil,
 \]
 with the meanings shown in \cref{tab:params}. The exponents are not optimised;
-\cref{tab:requirements} at the end of this subsection lists what the proof
-needs from them.
+\cref{sec:exponents}, at the end of the proof, lists what the proof needs from
+them.
 
 \begin{table}[h]
 \centering\small
@@ -967,8 +956,8 @@ cherries possible.
 For every round $r\le R$:
 \begin{enumerate}[label=\textup{(H\arabic*)},leftmargin=3.2em,itemsep=1pt]
 \item\label{it:H-size} every piece $Y\in\cY_r$ has $m_r\le|Y|\le M_r$;
-\item\label{it:H-overlap} $\sum_{Y\in\cY_r}|Y|<4n/3$, so $|\cY_r|<4n/(3m_r)$; and
-$\sum_{Y\in\cY_r}|\sh_r(Y)|<n/\log m_r$;
+\item\label{it:H-overlap} $\sum_{Y\in\cY_r}|Y|<4n/3$, so $|\cY_r|<4n/(3m_r)$;
+\item\label{it:H-shared} $\sum_{Y\in\cY_r}|\sh_r(Y)|<n/\log m_r$;
 \item\label{it:H-cycles} $|\cC_r|\le n/(2\lambda_r^2)$;
 \item\label{it:H-degree} $d_{r+1}\le\lambda_r^{55}$;
 \item\label{it:H-sep} \emph{(separation)} for every $\ell>r$, no edge of
@@ -991,8 +980,9 @@ $M_r/(2^8\log^2M_r)\ge d_r^2/(2^{8}\cdot9\lambda_r^2)>d_r\lambda_r^2$. But
 $W\subseteq G'_r$, which has no such cycle. So the first-stage leaves, and
 hence all pieces, have order at most $M_r$.
 
-\ref{it:H-overlap} This follows from \cref{lem:tree}\ref{it:tree-overlap}
-and~\ref{it:tree-shared} with $\gamma=m_r$.
+\ref{it:H-overlap},\ref{it:H-shared} These follow from
+\cref{lem:tree}\ref{it:tree-overlap} and~\ref{it:tree-shared} with
+$\gamma=m_r$.
 
 \ref{it:H-cycles} Each removed cycle has at least $d_r\lambda_r^2$ of the
 $d_rn/2$ edges of $G_r$.
@@ -1028,7 +1018,8 @@ $M_R\ge D^2$.
 $M_\ell\le(55\mu_{\ell-2})^{111}\le(55\mu_r)^{111}$, and $2^{\ell-r}\le\lambda_r$.
 \item\label{it:sc-sum} For fixed $a>0$ and $k\ge0$,
 $\sum_{r=1}^R(R-r+1)^k\mu_r^{-a}=O_{a,k}\bigl((\log\log D)^{-a}\bigr)$. The same
-holds with $\mu_r$ replaced by $\lambda_r$, $m_r$ or $M_r$, which are larger.
+holds with $\mu_r$ replaced by $\lambda_r$, $m_r$ or $M_r$, which are at least
+$\mu_r$.
 \end{enumerate}
 \end{lemma}
 
@@ -1050,37 +1041,6 @@ once per pair of rounds, are summable because the parameters grow like a tower
 towards earlier rounds. Part~\ref{it:sc-two} is why anchors are taken two rounds
 back: $M_{r+1}$ may be as large as $\lambda_r^{110}$, but $M_{r+2}$ is only
 polylogarithmic in $\lambda_r$.
-
-\paragraph{Where the exponents come from.} The relations between the
-parameters that the proof uses are collected in \cref{tab:requirements}. In
-short: the pieces must be robust enough to lend edges to later rounds and to
-clear vertices ($s$ large); the cut threshold must be large enough for the
-splitting step but negligible compared with the pieces
-($s\log^2M\ll\tau\ll m$); and the next degree, about $s\lambda+m$, must still be
-polylogarithmic.
-
-\begin{table}[h]
-\centering\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}p{0.42\textwidth}p{0.5\textwidth}@{}}
-\toprule
-requirement & where it is used\\
-\midrule
-$\tau\ge256s\log^2M$ & splitting steps of round $r$ are legal (\cref{lem:split})\\
-$\frac{56}3s\log M+\frac43m\le\lambda^{55}$ & the next degree is $d_{r+1}\le\lambda_r^{55}$, see~\ref{it:H-degree}\\
-$\tau/m\le2/\lambda$ and $\log m\ge\mu$ & hubs and crowding are summable over rounds (\cref{lem:bookkeeping})\\
-$s/4\ge\log^{40}M$ & a piece can clear vertices with its own edges (\cref{lem:clear})\\
-$s\lambda^{-4}\ge\lambda^{46}\gg M_\ell^{13}\log^{18}M$ for $\ell\ge r+2$ & lent edges link through sparse slots (\cref{lem:good})\\
-$s\lambda^{-5}\gg M_\ell^{15}$ for $\ell\ge r+2$ & donor sets are large (\cref{lem:deficient})\\
-$m\ge M_\ell$ for $\ell\ge r+2$ & bad anchors are rare compared with slots (\cref{lem:Omega})\\
-\bottomrule
-\end{tabular}
-\caption{What the proof needs from the exponents. Here $\lambda=\lambda_r$,
-$\mu=\mu_r$, and $M_\ell\le(55\mu_r)^{111}$ by \cref{lem:scales}; the last
-three requirements hold because $\lambda_r=2^{\mu_r}$ is exponentially larger
-than any fixed power of $\mu_r$.}
-\label{tab:requirements}
-\end{table}
 
 \subsection{Roles}\label{sec:roles}
 
@@ -1107,6 +1067,19 @@ needed to close the cherries of an anchor grows with its crowding
 $\nu_\ell$ be the number of pieces of rounds at most $\ell-2$, that is, the
 number of possible anchors in round $\ell$.
 
+The next lemma bounds everything that the assembly in \cref{sec:proof} charges
+to the roles. Each item pays for one cost:
+\begin{enumerate}[label=\textup{(\alph*)},itemsep=1pt]
+\item fresh vertices are cleared and paired at a cost of $O(1)$ each per round
+(Steps~1 and~3), so they must be few when summed over all rounds;
+\item hubs are cleared (Step~1) and become vertices of the quotient (Step~4);
+\item closing the cherries of an anchor $Y$ costs about $\kappa_{Y,\ell}/2$
+cycles (Step~2);
+\item it also costs about $2M_\ell$ cycles per anchor in use, so we need
+$\sum_\ell\nu_\ell M_\ell=o(n)$;
+\item the long cycles are objects of the decomposition.
+\end{enumerate}
+
 \begin{lemma}[Bookkeeping]\label{lem:bookkeeping}
 \leavevmode
 \begin{enumerate}[label=\textup{(\alph*)},itemsep=1pt]
@@ -1127,7 +1100,7 @@ round $r_0$ containing $u$ makes $u$ a port. So $u$ is fresh in at most the two
 rounds $r_0$ and $r_0+1$.
 
 \ref{it:bk-hub} A hub lies in two leaves of $\cT_\ell$, so
-$X\cap\Hub_\ell\subseteq\sh_\ell(X)$. By~\ref{it:H-overlap} the inner sum is
+$X\cap\Hub_\ell\subseteq\sh_\ell(X)$. By~\ref{it:H-shared} the inner sum is
 less than $n/\log m_\ell\le n/(54\mu_\ell)$. Now sum using
 \cref{lem:scales}\ref{it:sc-sum}.
 
@@ -1135,7 +1108,7 @@ less than $n/\log m_\ell\le n/(54\mu_\ell)$. Now sum using
 $hu\in E(G_\ell)\subseteq E(G_{r+1})$. If $u\notin\sh_r(Y)$, there are fewer
 than $\tau_r$ such $u$ for a fixed $h$, by the thin-cut
 property~\ref{it:H-thin}. All other such $u$ lie in $\sh_r(Y)$. Summing over
-$Y\in\cY_r$ with~\ref{it:H-overlap}, and then over the fewer than $R-r$ rounds
+$Y\in\cY_r$ with~\ref{it:H-overlap} and~\ref{it:H-shared}, and then over the fewer than $R-r$ rounds
 $\ell$, the total is at most
 \[
 \sum_r(R-r)\Bigl(\frac{4n}{3m_r}\tau_r+\frac{n}{\log m_r}\Bigr)
@@ -1158,8 +1131,21 @@ n/\lambda_{\ell-2}$, and the sum is $\oD$ by \cref{lem:scales}\ref{it:sc-sum}.
 
 Every cycle we build through an expander is closed by a path through a sparse
 random set of vertices. This section states that robust expanders support such
-paths, for many pairs at once. First we note that a random sample of the edges
-of an expander is again an expander.
+paths, for many pairs at once. Recall that a path is through a set $V$ if all
+its interior vertices lie in~$V$.
+
+\begin{definition}[Linking]\label{def:linking}
+Let $H$ be a graph, $V\subseteq V(H)$ and $t\ge1$. We say that $H$ \emph{links
+through $V$ with multiplicity $t$} if the following holds for every multiset
+$\cP$ of pairs of distinct vertices of $H$ in which every vertex lies in at most
+$t$ pairs, counted with multiplicity: there are pairwise edge-disjoint paths
+$P_\pi$, $\pi\in\cP$, in $H$, such that $P_\pi$ joins the two vertices of $\pi$
+and is through~$V$.
+\end{definition}
+
+This is the notion of path connectivity of~\cite[Definition~7]{BM}, without
+the bound on the lengths of the paths, which we never need. First we note
+that a random sample of the edges of an expander is again an expander.
 
 \begin{lemma}[Sampling edges]\label{lem:sample}
 Let $H$ be an $s$-expander on $N$ vertices, and let $0<p\le1$ with
@@ -1244,24 +1230,26 @@ only $\rho/O(L^3)$, and the powers of $L$ come from the sublinear expansion.
 
 This section proves the three local moves of the proof. They are stated without
 reference to the hierarchy. In \cref{sec:proof} they are applied once per piece
-(\cref{lem:clear}) and once per round (\cref{lem:cherry,lem:quotient}). In all
-three, $\Delta$ denotes a bound on degrees; in the application it is $M_\ell$.
+(\cref{lem:clear}) and once per round (\cref{lem:cherry,lem:quotient}). In the
+last two, $\Delta$ denotes a bound on degrees; in the application it is
+$M_\ell$.
 
 \subsection{Clearing a set of vertices}
 
 \begin{lemma}[Clearing]\label{lem:clear}
 There is an absolute constant $N_0$ such that the following holds. Let $O$ be
 an $s$-expander with vertex set $X$, where $N=|X|\ge N_0$ and
-$s\ge\log^{40}N$. Let $E\supseteq E(O)$ be a set of edges with both ends in
-$X$, and let $P\subseteq X$. Then there is a set $O'\subseteq E(O)$ with
+$s\ge\log^{40}N$. Let $E$ be a set of edges with both ends in $X$, and let
+$P\subseteq X$. Then there is a set $O'\subseteq E(O)$ with
 \[
 f\bigl(E[P]\cup O'\bigr)\le101|P|.
 \]
 \end{lemma}
 
-So all edges inside $P$ can be removed at a constant cost per vertex of $P$,
-using some further edges of $O$. Every edge of $E\setminus(E[P]\cup O')$ has an
-end outside $P$.
+In words: at a cost of $O(1)$ cycles and edges per vertex of $P$, we can
+decompose all edges of $E$ with both ends in $P$, together with some edges of
+the expander $O$. In the application $O$ consists of edges of $E$, and every
+edge of $E$ that is left over has an end outside~$P$.
 
 The proof uses a \emph{vortex}, a nested sequence of random sets
 $P=P_0\supseteq P_1\supseteq\dots\supseteq P_k$ whose sizes halve. This device
@@ -1285,24 +1273,24 @@ of \emph{outlets}, chosen so that no vertex is an outlet of too many others.
 Let $L=\log N$, and assume $P\ne\varnothing$.
 
 \emph{Outlets.} Let $a=\lceil L^6\rceil$ and $b=\lceil64aL^2\rceil=\lceil
-2aL^2/\eps\rceil$. We claim that every vertex $w$ has a set $\Omega(w)$ of $a$
+2aL^2/\eps\rceil$. We claim that every vertex $w$ has a set $\mathrm{Out}(w)$ of $a$
 neighbours in $O$, its \emph{outlets}, such that every vertex is an outlet of
 at most $b$ vertices. Form a bipartite graph. On the left are the ordered pairs
 $(w,y)$ with $wy\in E(O)$. On the right, every vertex $y$ has $b$ \emph{load}
 slots and every vertex $w$ has $\deg_O(w)-a\ge0$ \emph{spare} slots. Join
 $(w,y)$ to the load slots of $y$ and to the spare slots of $w$. A matching that
 covers the left side gives, for every $w$, at least $a$ pairs $(w,y)$ matched to
-load slots, and we let $\Omega(w)$ consist of $a$ of these vertices $y$.
+load slots, and we let $\mathrm{Out}(w)$ consist of $a$ of these vertices $y$.
 
 We check Hall's condition~\cite{Hal}. Let $\Psi$ be a set of pairs, let
-$\Theta$ be the set of their second coordinates, and let $S$ be the set of $w$
+$Z$ be the set of their second coordinates, and let $S$ be the set of $w$
 that occur in more than $\deg_O(w)-a$ pairs of $\Psi$. Then
-$|\Psi|\le(\text{spare slots})+a|S|$, so it suffices that $b|\Theta|\ge a|S|$.
+$|\Psi|\le(\text{spare slots})+a|S|$, so it suffices that $b|Z|\ge a|S|$.
 This holds trivially if $S=\varnothing$. Otherwise every $w\in S$ has fewer
-than $a$ neighbours outside $\Theta$. Take $S'\subseteq S$ with
+than $a$ neighbours outside $Z$. Take $S'\subseteq S$ with
 $|S|/2\le|S'|\le2N/3$, and delete the at most $(a-1)|S'|\le s|S'|$ edges from
-$S'$ to outside $\Theta$. Then the external neighbourhood of $S'$ lies in
-$\Theta$, so $|\Theta|\ge\eps|S'|/L^2\ge\eps|S|/(2L^2)$, and $b|\Theta|\ge a|S|$.
+$S'$ to outside $Z$. Then the external neighbourhood of $S'$ lies in
+$Z$, so $|Z|\ge\eps|S'|/L^2\ge\eps|S|/(2L^2)$, and $b|Z|\ge a|S|$.
 
 \emph{The random vortex.} Let $k=\lfloor\log(L/6)\rfloor$, so that
 $6/L\le2^{-k}<12/L$. Make the following independent random choices.
@@ -1324,7 +1312,7 @@ probability the following hold:
 \item\label{it:V-link} every $O_{j,c}$ with $c\in\{1,2\}$ links through
 $V_{j,c}$ with multiplicity $b+2$;
 \item\label{it:V-res} for every $w\in P$ and $j<k$, at least four edges of
-$O^{\mathrm{res}}$ join $w$ to $\Omega(w)\cap V_{j,0}$;
+$O^{\mathrm{res}}$ join $w$ to $\mathrm{Out}(w)\cap V_{j,0}$;
 \item\label{it:V-size} $\sum_{j<k}|P_j|\le8|P|$ and $|P_k|\le48|P|/L$.
 \end{enumerate}
 By \cref{lem:sample}, each $O_{j,c}$ is an $s/(4k+2)$-expander with
@@ -1333,7 +1321,7 @@ with probability at least $2^{-k}/4\ge1/L$. So \cref{lem:link}, with
 $t=b+2=O(L^8)$ and $\rho=1/L$, gives~\ref{it:V-link} with probability
 $1-O(kN^{-3})$; it needs $s/(4k+2)\ge C_*(b+2)L^{21}$, which holds as
 $s\ge L^{40}$. For \ref{it:V-res}, the number of such edges is a sum of
-independent indicators, one for each $y\in\Omega(w)$, with mean at least
+independent indicators, one for each $y\in\mathrm{Out}(w)$, with mean at least
 $a\cdot\frac1{2k+1}\cdot\frac6L\cdot\frac12\ge L^4$. So by \cref{lem:chernoff}
 it is less than four with probability at most $e^{-L^4/3}$, and a union bound
 over the $Nk$ pairs $(w,j)$ costs $o(1)$. For \ref{it:V-size}, the means are
@@ -1356,11 +1344,16 @@ which is disjoint from $U_{j+1}$, and the other end has only one label.
 \cref{lem:lovasz} into at most $|P_j|$ paths, with every vertex an end of at
 most two of them. At every end $w\in\Lambda_j$ of such a path, append a
 distinct phase-$c$ reserved edge of $w$. The result is a trail whose ends lie in
-$U_{j+1}$, all of whose edges meet $\Lambda_j$, and which avoids $V_{j,c}$. Only
-its two new end vertices can repeat a vertex. So cutting out closed subtrails
-splits it into at most two cycles and at most one path $P'$ that joins its two
-ends, if they differ. All cycles have length at least three, since the graph is
-simple. The path $P'$ has length at least two, because each of its edges meets
+$U_{j+1}$, all of whose edges meet $\Lambda_j$, and which avoids $V_{j,c}$.
+The path has no repeated vertex, so a vertex can occur twice on the trail only
+if it is a new end vertex. If some vertex $y$ occurs twice, the part of the
+trail between its first two occurrences is a closed trail with no other
+repetition, that is, a cycle; we cut it out. It has length at least three,
+because the graph is simple and the appended reserved edges are not edges of
+the path (they were removed from $F_j$ in~(1)). Each cut removes an occurrence
+of a new end vertex, so after at most two cuts we are left with at most two
+cycles and at most one path $P'$ that joins the two ends of the trail, if these
+differ. The path $P'$ has length at least two, because each of its edges meets
 $\Lambda_j$ and its ends do not.
 \item For each phase $c$, join the two ends of every residual path $P'$ by a
 path through $V_{j,c}$ in $O_{j,c}$, edge-disjointly, using~\ref{it:V-link}. A
@@ -1447,7 +1440,7 @@ handled in later steps.}
 
 The second lemma chains cherries into cycles. In the application the ports are
 the ports of one round, the classes are given by their anchors, and the graphs
-$R_{Y,j}$ consist of edges lent by the anchors. Informally, it says: if every
+$R_{Y,j}$ are the closing reservoirs of the anchors. Informally, it says: if every
 edge to be decomposed has a port end, if edges at a port leave its class, and if
 each class has $K$ edge-disjoint reservoirs linking through $K$ disjoint slots,
 then all edges except at most one per pair (non-port, class) can be covered by
@@ -1464,9 +1457,9 @@ that:
 at a port of $\Pi_Y$ has its other end outside $Y$;
 \item\label{it:C2} every port is incident with at most $\Delta$ edges of $E'$;
 \item\label{it:C3} for each $Y\in\cY$ there are pairwise disjoint sets
-$T_{Y,1},\dots,T_{Y,K}\subseteq Y\setminus\Pi_Y$ and graphs
-$R_{Y,1},\dots,R_{Y,K}$ with $V(R_{Y,j})\supseteq Y$ such that $R_{Y,j}$ links
-through $T_{Y,j}$ with multiplicity $\Delta$;
+$T_{Y,1},\dots,T_{Y,K}\subseteq Y\setminus\Pi_Y$, the \emph{slots}, and graphs
+$R_{Y,1},\dots,R_{Y,K}$ with $V(R_{Y,j})\supseteq Y$, the \emph{reservoirs},
+such that $R_{Y,j}$ links through $T_{Y,j}$ with multiplicity $\Delta$;
 \item\label{it:C4} the edge sets of all graphs $R_{Y,j}$ are pairwise disjoint
 and disjoint from $E'$.
 \end{enumerate}
@@ -1549,18 +1542,39 @@ one cycle.}
 \subsection{The quotient}
 
 The third lemma turns the leftover edges into edges of an auxiliary graph whose
-cycles lift to cycles of $G$. Leftovers are of two kinds: \emph{hub edges} $au$
-from a hub $a$ to a port $u$, and \emph{links} $uv$ or $u\,x\,v$ between two
-ports, possibly through a middle vertex $x$. Every end at a port is attached to
-a pool vertex by a private \emph{donor} edge (\cref{fig:quotient}). Two things
-must be controlled. First, the auxiliary graph must be simple. This is achieved
-by splitting parallel edges into layers. Second, it must be small. Hubs are
-grouped so that each hub has few copies, and the random choices of donors
-spread the links evenly over the pools.
+cycles lift to cycles of the host graph. Leftovers are of two kinds:
+\emph{hub edges} $au$ from a hub $a$ to a port $u$, and \emph{links} $uv$ or
+$u\,x\,v$ between two ports, possibly through a middle vertex $x$. Every end at
+a port is extended by a private \emph{donor} edge to a vertex of a pool. A hub
+edge $au$ with donor $w$ becomes the edge $aw$ of the auxiliary graph, and a
+link with donors $w^-$ and $w^+$ at its two ends becomes the edge $w^-w^+$
+(\cref{fig:quotient}).
+
+For a cycle of the auxiliary graph to lift to a cycle, the paths represented by
+its edges must be edge-disjoint and must not pass through each other's interior
+vertices. The danger is at ports: a port $u$ may lie on up to $\Delta$ hub
+edges and links, and two of the represented paths through $u$ must never lie on
+a common cycle. So we split the auxiliary graph into vertex-disjoint parts in
+which every port and every middle lies on at most one represented path. Hub
+edges are coloured so that hub edges at a common port get distinct colours, and
+the few hub edges for which this fails are paid for. Links are coloured so that
+links of one colour share no port or middle. Within one colour, parallel edges
+are separated into \emph{layers}, so that each layer is simple. The quotient
+$Q$ is the vertex-disjoint union of all layers. A vertex of the host graph that
+occurs in several layers thus occurs in $Q$ several times, once per layer; we
+call these occurrences its \emph{copies}. The size of $Q$ is the total number
+of copies, and the work is to keep it small. Hubs have few copies because their
+hub edges are processed in large groups. Pool vertices have few copies because
+the donors of links are chosen at random, which spreads the links evenly over
+the pools.
+
+There are two pools, $W^-$ and $W^+$, because a link chooses the donor at its
+tail from $W^-$ and the donor at its head from $W^+$. This prevents loops, and
+it makes the two ends of a link independent, which the occupancy estimate in
+the proof needs.
 
 \begin{lemma}[Quotient]\label{lem:quotient}
-Let $\Delta\ge2$, $g\ge4\Delta+4$ and $n\ge1$ be integers; $n$ only sets the
-scale of the error term, and in our application it is $|V(G)|$. Let $A$, $\Pi$,
+Let $\Delta\ge2$ and $g\ge4\Delta+4$ be integers. Let $A$, $\Pi$,
 $I$, $W^-$ and $W^+$ be pairwise disjoint sets of vertices of a graph $\Gamma$
 (hubs, ports, middles and two pools), and let $W=W^-\cup W^+$. Suppose we are
 given:
@@ -1569,7 +1583,7 @@ given:
 set $\cL$ of \emph{links}, each an edge $uv$ or a path $u\,x\,v$ of $\Gamma$
 with $u\ne v\in\Pi$ and $x\in I$, all edges involved being distinct;
 \item every port lies on at most $\Delta$ hub edges and links, every middle lies
-on at most $\Delta$ links, and $|\cH|,|\cL|\le n\Delta$;
+on at most $\Delta$ links;
 \item for every port $u$, \emph{donor sets} $D^-(u)\subseteq\NN_\Gamma(u)\cap
 W^-$ and $D^+(u)\subseteq\NN_\Gamma(u)\cap W^+$, each of size at least $g$;
 \item a function $\beta:W\to\mathbb{Z}_{\ge0}$ such that for all $a\in A$ and
@@ -1581,7 +1595,7 @@ $w\in W$,
 Then there are a set $\cH_\paid\subseteq\cH$ and a simple graph $Q$ with
 \[
 |\cH_\paid|+|V(Q)|\le|A|+\Delta^3\sum_{w\in W}\beta(w)
-+3\Delta\lceil2\log\Delta\rceil|W|+30n\Bigl(\frac\Delta g+\frac1\Delta\Bigr),
++3\Delta\lceil2\log\Delta\rceil|W|+30\bigl(|\cH|+|\cL|\bigr)\Bigl(\frac1g+\frac1{\Delta^2}\Bigr),
 \]
 such that whenever $Q$ has a decomposition into $k$ objects, the set
 $(\cH\setminus\cH_\paid)\cup E(\cL)\cup D'$ has a decomposition into at most $2k$
@@ -1598,10 +1612,11 @@ $\cM_1,\cM_2,\dots$, where $\cM_i$ contains the $i$-th edge of each parallel
 class, and isolated vertices are removed. Their total number of vertices is
 $\sum_v\max_wm(v,w)$.
 
-\emph{The random choices.} The proof makes two kinds of independent random
-choices: a colour for every group of hub edges (defined below), and, for every
-port $u$, a pair of injections $\phi^-_u,\phi^+_u$. All other choices are
-deterministic functions of these.
+\emph{The random choices.} The proof makes two kinds of random choices. First,
+every group of hub edges (defined below) gets a colour, independently and
+uniformly. Then, given the colours, every port $u$ gets a pair of injections
+$\phi^-_u,\phi^+_u$, chosen independently and uniformly, whose ranges depend on
+the colours. All other choices are deterministic functions of these.
 
 \emph{Hub edges.} For every hub $a$, split the hub edges at $a$ into groups of
 size $\lfloor g/2\rfloor$, except for at most one smaller group. There are at
@@ -1610,18 +1625,18 @@ $\Delta^3$ colours, and give each hub edge the colour of its group. Let
 $\cH_\paid$ be the set of hub edges $au$ for which another hub edge at $u$ has
 the same colour. Two hub edges at $u$ come from different hubs, hence from
 different groups, so $\Pr(au\in\cH_\paid)\le(\Delta-1)/\Delta^3$ and
-$\E|\cH_\paid|\le|\cH|/\Delta^2\le n/\Delta$. For each hub edge
+$\E|\cH_\paid|\le|\cH|/\Delta^2$. For each hub edge
 $au\notin\cH_\paid$ choose a donor $w(au)\in D^-(u)\cup D^+(u)$, by a fixed
 greedy rule. The donors must be distinct for distinct hub edges at the same
 port and for hub edges in the same group. This is possible, since fewer than
-$\Delta+g/2\le g$ choices are excluded. For each colour $\gamma$, let
-$\cM_\gamma$ be the multigraph with an edge $a\,w(au)$ for every hub edge
-$au\notin\cH_\paid$ of colour $\gamma$. A group contributes at most one edge to
-any pair $(a,w)$, so the copies of $a$ in the layers of all $\cM_\gamma$ number
+$\Delta+g/2\le g$ choices are excluded. For each colour $c$, let
+$\cM_c$ be the multigraph with an edge $a\,w(au)$ for every hub edge
+$au\notin\cH_\paid$ of colour $c$. A group contributes at most one edge to
+any pair $(a,w)$, so the copies of $a$ in the layers of all $\cM_c$ number
 at most the number of groups at $a$. Distinct hub edges at $a$ with the same
 donor $w$ have distinct ports, so by~\eqref{eq:beta} every pool vertex $w$ has
 at most $\beta(w)$ copies per colour. These layers therefore have at most
-$|A|+4n\Delta/g+\Delta^3\sum_w\beta(w)$ vertices.
+$|A|+4|\cH|/g+\Delta^3\sum_w\beta(w)$ vertices.
 
 \emph{Links.} Colour the links greedily with at most $3\Delta$ colours so that
 links of the same colour share no port and no middle; a link meets at most
@@ -1632,9 +1647,9 @@ $\phi^+_u$ be a uniformly random injection from the links entering $u$ into
 $D^+(u)$ minus those donors. The domains have size at most $\Delta$, and the
 ranges have size at least $g-\Delta\ge g/2$. A link from $u$ to $v$ thus gets
 a \emph{tail junction} $w^-=\phi_u^-(\text{link})\in W^-$ and a \emph{head
-junction} $w^+=\phi_v^+(\text{link})\in W^+$. For each colour $\gamma$, let
-$\cN_\gamma$ be the multigraph with an edge $w^-w^+$ for every link of colour
-$\gamma$, and split it into layers.
+junction} $w^+=\phi_v^+(\text{link})\in W^+$. For each colour $c$, let
+$\cN_c$ be the multigraph with an edge $w^-w^+$ for every link of colour
+$c$, and split it into layers.
 
 To bound the number of vertices we use an occupancy estimate. Let
 $\xi_1,\dots,\xi_q$ be independent random variables, each taking every value
@@ -1652,22 +1667,23 @@ $\max_yX_y\le T-1+\sum_yX_y\mathbf1_{X_y\ge T}$ and $\sum_y\E X_y=q$.
 Condition on the colours of the groups, which determine the hub donors and
 hence the ranges of all injections, and on all the injections $\phi^-_u$,
 which determine the tail junctions. The injections $\phi^+_v$ are still
-independent and uniform. Fix a colour $\gamma$ and a pool vertex $w\in W^-$.
-The links of colour $\gamma$ with tail junction $w$ have distinct head ports,
+independent and uniform. Fix a colour $c$ and a pool vertex $w\in W^-$.
+The links of colour $c$ with tail junction $w$ have distinct head ports,
 because links of one colour share no port. So their head junctions are
 determined by different injections $\phi^+_v$. They are therefore independent,
 and each is uniform on a set of size at least $g/2$. The number of copies of
-$w$ in the layers of $\cN_\gamma$ is the maximum multiplicity of an edge at
+$w$ in the layers of $\cN_c$ is the maximum multiplicity of an edge at
 $w$. By~\eqref{eq:occupancy} with $t=\lceil2\log\Delta\rceil$ and $\pi=2/g$, its
 conditional expectation is at most $t+4eq_w/g+4eq_w/\Delta^2$, where $q_w$ is
 the number of these links. The same holds for $w\in W^+$, conditioning on the
-head junctions instead. Summing over $w$ and over the $3\Delta$ colours, the
-expected number of vertices in the layers of all $\cN_\gamma$ is at most
-$3\Delta t|W|+8en\Delta/g+8en/\Delta$.
+head junctions instead. Summing over $w$ and over the $3\Delta$ colours, and
+using that every link is counted once at its tail junction and once at its head
+junction, the expected number of vertices in the layers of all $\cN_c$ is
+at most $3\Delta t|W|+8e|\cL|/g+8e|\cL|/\Delta^2$.
 
 \emph{The graph $Q$.} Let $Q$ be the vertex-disjoint union of all layers of all
-$\cM_\gamma$ and $\cN_\gamma$. Adding up, $\E(|\cH_\paid|+|V(Q)|)$ is at most
-the bound in the lemma, since $4+8e<30$ and $1+8e<30$. Fix an outcome of the
+$\cM_c$ and $\cN_c$. Adding up, $\E(|\cH_\paid|+|V(Q)|)$ is at most
+the bound in the lemma, since $8e<30$. Fix an outcome of the
 random choices that achieves this bound.
 
 \emph{Lifting.} An edge $aw$ of $Q$ that comes from the hub edge $au$
@@ -1762,85 +1778,76 @@ $1,\dots,R$, and use the notation of \cref{sec:hierarchy}.
 
 \subsection{Plan}\label{sec:plan}
 
-The proof has two phases.
+The proof has three parts.
 
 \emph{Random preparation} (\cref{sec:random}). One random experiment, carried
 out once for all pieces, does three things. It colours the edges of every
-piece $Y$, so that $Y$ keeps half of its edges for itself and lends small
-random slices to each later round. It chooses random \emph{slots} inside $Y$,
-through which the lent edges will route. And it chooses sparse random
-\emph{pools} of vertices for the quotients. A few ports are unlucky: their anchor
-is bad, they fall into a slot of their anchor (\emph{lost} ports), or they have
-too few donor edges (\emph{deficient} ports). One random variable $\Omega$
-collects everything that such ports, and the pools, cost. Its expectation is
-$\oD$, and we fix an outcome with $\Omega=\oD$.
+piece $Y$, so that $Y$ keeps half of its edges for itself and divides the rest
+into small random reservoirs for the later rounds. It chooses random
+\emph{slots} inside $Y$, through which the connectors that close cherries will
+run. And it chooses sparse random \emph{pools} of vertices for the quotients.
+For a few ports these choices fail: their anchor is \emph{bad}, or they fall
+into a slot of their anchor (these ports are \emph{lost}), or they have too few
+donor edges to the pools (these ports are \emph{deficient}).
 
-\emph{Deterministic assembly} (\cref{sec:assembly}). We decompose the rounds in
-the order $R,R-1,\dots,1$. Round $\ell$ starts from the edges assigned to its
-pieces, minus the lent edges that later rounds have already used, and runs four
-steps (\cref{fig:pipeline}). \Cref{lem:ledger} checks that every edge of $G$ is
-used exactly once, and \cref{sec:count} adds up the costs.
+\emph{Assembly} (\cref{sec:assembly}). For every outcome of the random
+preparation, we decompose the rounds in the order $R,R-1,\dots,1$. Round $\ell$
+starts from the edges assigned to its pieces, minus the reservoir edges that
+later rounds have already used, and runs the four steps of
+\cref{sec:strategy}; \cref{fig:pipeline} in \cref{sec:assembly} gives an
+overview. Lost ports are cleared together with
+hubs and fresh vertices, and the edges at deficient ports are paid for.
+\Cref{lem:ledger} checks that every edge of $G$ is used exactly once.
 
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}[
-  stage/.style={draw=black!70,line width=.5pt,rounded corners=2pt,fill=black!3,align=left,font=\footnotesize,inner sep=4pt,text width=6.1cm},
-  stepnote/.style={font=\footnotesize,align=left,text width=5.6cm,text=black},
-  costnote/.style={font=\footnotesize,align=left,text width=4.4cm,black!70},
-  node distance=3.5mm]
-  \node[stage] (s0) {$F_X=E_X\setminus\Used$ for every piece $X$ of round $\ell$:
-  the edges assigned to $X$ that later rounds have not borrowed};
-  \node[stage,below=13mm of s0] (s1) {$E'_X$: every edge has an end at a live
-  port};
-  \node[stage,below=13mm of s1] (s2) {$J_\ell$: at most one edge from each
-  vertex that is not a live port to the live ports of each anchor};
-  \node[stage,below=13mm of s2] (s3) {hub edges (hub to port) and links (port to
-  port, possibly through a fresh middle)};
-  \node[stage,fill=cRes!15,below=13mm of s3] (s4) {$Q_\ell$, decomposed by
-  induction};
-  \foreach \a/\b/\t/\c in {
-    s0/s1/{\textbf{Step 1.} Clear hubs, fresh vertices and lost ports (\cref{lem:clear})}/{$101$ per vertex cleared},
-    s1/s2/{\textbf{Step 2.} Close cherries through lent edges (\cref{lem:cherry})}/{$\sum_Y(\kappa_{Y,\ell}/2+2M_\ell)+n/(2M_\ell)$},
-    s2/s3/{\textbf{Step 3.} Pay at lost, pool and deficient vertices; pair at fresh ones}/{part of $\Omega$, plus one edge per fresh vertex},
-    s3/s4/{\textbf{Step 4.} Attach donors; quotient (\cref{lem:quotient})}/{$|\cH_\paid|+2f(Q_\ell)$}}{
-    \draw[arr] (\a.south) -- (\b.north) node[midway,right=1mm,stepnote] {\t};
-    \node[costnote,anchor=east] at ($(\a.south)!0.5!(\b.north)+(-3.4,0)$) {\c};
-  }
-\end{tikzpicture}
-\caption{One round of the assembly. Boxes show the edges that remain after each
-step. The text to the right of each arrow says what the step does, and the text
-to the left says what it costs.}
-\label{fig:pipeline}
-\end{figure}
+\emph{Counting} (\cref{sec:count}). The cost of the assembly depends on the
+random outcome only through the lost and deficient ports and the pools. We
+collect this dependence in one random variable $\Omega$, show that
+$\E\Omega=\oD$, and fix an outcome with $\Omega\le\E\Omega$. Adding up all
+costs then proves \cref{thm:reduction}.
 
-\paragraph{Where the costs go.} Only two things cost $\Theta(n)$: fresh
-vertices, which are cleared and paired at most twice each, and the final sparse
-graph $G_{R+1}$. Hubs, crowding, the number of anchors and $\Omega$ are summable
-over the rounds by \cref{lem:scales}\ref{it:sc-sum}, so they cost $\oD$. The
-quotients have $\oD$ vertices in total and are handled by induction.
+
+\paragraph{Where the costs go.} As in the budget of \cref{sec:strategy}, only
+three things cost $\Theta(n)$: the edges of the final sparse graph $G_{R+1}$;
+the fresh vertices, which are cleared and paired at most twice each; and the
+lifted decompositions of the quotients, which have $\oD$ vertices in total and
+are handled by induction. Everything else (long cycles, hubs, cherries, unlucky
+ports and pools) is summable over the rounds by
+\cref{lem:scales}\ref{it:sc-sum}, so it costs $\oD$.
 
 \subsection{Random preparation}\label{sec:random}
 
-\paragraph{Reservoirs.} Let $Y$ be a piece of round $r$. It lends to the rounds
-$\ell\in\{r+2,\dots,R\}$, and for each such round it needs $M_\ell^2$ closing
-colours and one donor colour. Put
+\paragraph{Reservoirs and slots.} Let $Y$ be a piece of round $r$. It lends to
+the rounds $\ell\in\{r+2,\dots,R\}$. For each such round it provides
+$K=M_\ell^2$ \emph{closing reservoirs}, one for each position of a cherry in a
+chain of \cref{lem:cherry}, and one \emph{donor reservoir} for the quotient.
+Each closing reservoir comes with its own random set of \emph{slot} vertices
+through which its connectors run. The numbers are chosen as follows. With
+$K=M_\ell^2$ closing reservoirs, \cref{lem:cherry} costs only
+$|E'|/(2K)\le n/(2M_\ell)$ beyond the crowding terms. Each slot set is a random
+set of density $M_\ell^{-4}$. This is sparse enough that a given port lies in
+some slot with probability only $M_\ell^2\cdot M_\ell^{-4}=M_\ell^{-2}$, and
+dense enough for the linking lemma, because the reservoirs have degrees about
+$\lambda_r^{46}$, far larger than any fixed power of $M_\ell$. Put
 \[
-\chi_r=\sum_{\ell=r+2}^R(M_\ell^2+1).
+\chi_r=\sum_{\ell=r+2}^R(M_\ell^2+1),
 \]
-By \cref{lem:scales} we have $M_\ell\le M_{r+2}2^{-(\ell-r-2)}$ and
-$M_{r+2}\le(55\mu_r)^{111}$, so $\chi_r\le3(55\mu_r)^{222}\le\lambda_r^4/2$.
+the number of reservoirs of $Y$. By \cref{lem:scales} we have
+$M_\ell\le M_{r+2}2^{-(\ell-r-2)}$ and $M_{r+2}\le(55\mu_r)^{111}$, so
+$\chi_r\le3(55\mu_r)^{222}\le\lambda_r^4/2$.
 
 \begin{definition}[Reservoirs]\label{def:reservoir}
 Colour every edge of $H_Y$ independently at random. It gets the \emph{own}
 colour with probability $1/2$. Each of the following colours has probability
 $1/(2\chi_r)$: for every $\ell\in\{r+2,\dots,R\}$, the \emph{closing} colours
 $(\ell,j)$ with $j\in[M_\ell^2]$, and the \emph{donor} colour $\ell$. If
-$r+2>R$, all edges get the own colour. Let $O_Y$, $R_{Y,\ell,j}$ and
-$\Rdon_{Y,\ell}$ be the spanning subgraphs of $H_Y$ formed by these colour
-classes. Independently, for every $\ell$, give every vertex of $Y$ a
-\emph{slot} for round $\ell$. It is slot $j$ with probability $M_\ell^{-4}$ for
-each $j\in[M_\ell^2]$, and no slot otherwise. Let $T_{Y,\ell,j}$ be the set of
-vertices with slot $j$ for round $\ell$. The piece $Y$ is \emph{good} if
+$r+2>R$, all edges get the own colour. The \emph{own graph} $O_Y$, the
+\emph{closing reservoirs} $R_{Y,\ell,j}$ and the \emph{donor reservoirs}
+$\Rdon_{Y,\ell}$ are the spanning subgraphs of $H_Y$ formed by these colour
+classes; the last two kinds are the \emph{reservoirs} of $Y$. Independently,
+for every $\ell$, give every vertex of $Y$ a \emph{slot} for round $\ell$. It is
+slot $j$ with probability $M_\ell^{-4}$ for each $j\in[M_\ell^2]$, and no slot
+otherwise. Let $T_{Y,\ell,j}$ be the set of vertices with slot $j$ for round
+$\ell$. The piece $Y$ is \emph{good} if
 \begin{enumerate}[label=(G\arabic*),itemsep=1pt]
 \item\label{it:G1} $O_Y$ is an $(s_r/4)$-expander, and
 \item\label{it:G2} every $R_{Y,\ell,j}$ links through $T_{Y,\ell,j}$ with
@@ -1848,14 +1855,6 @@ multiplicity $M_\ell$.
 \end{enumerate}
 Otherwise it is \emph{bad}.
 \end{definition}
-
-The numbers are chosen as follows. There are $K=M_\ell^2$ closing colours for
-round $\ell$, so that \cref{lem:cherry} costs only $|E'|/(2K)\le n/(2M_\ell)$
-beyond the crowding terms. Each slot set is a random set of density
-$M_\ell^{-4}$, sparse enough that a given port lies in some slot with
-probability only $M_\ell^{-2}$, yet dense enough for the linking lemma, because
-the lent graphs have degrees about $\lambda_r^{46}$, far larger than any power
-of $M_\ell$.
 
 \begin{lemma}\label{lem:good}
 Every piece $Y$ is bad with probability at most $|Y|^{-2}$.
@@ -1897,7 +1896,7 @@ $W_\ell=W_\ell^-\cup W_\ell^+$, and for $w\in W_\ell$ let $r(w)$ be the second
 coordinate of its label. Every vertex lies in $W_\ell$ with probability less
 than $q_\ell$. So the pools are very sparse, which keeps the quotient small. Yet
 every port still has many donor candidates, because its anchor gives it about
-$\lambda_r^{46}$ donor edges (\cref{lem:deficient}).
+$\lambda_r^{46}$ edges of the donor reservoir (\cref{lem:deficient}).
 
 The pool of round $\ell$ is split by the round $r$ of the anchors it serves.
 The reason is condition~\eqref{eq:beta} of \cref{lem:quotient}: a pool vertex
@@ -1934,7 +1933,9 @@ $e^{-g_\ell}$.
 \end{proof}
 
 \Cref{tab:random} summarises the random choices. They are all independent, and
-they are made after the hierarchy and the anchors have been fixed.
+they are made after the hierarchy and the anchors have been fixed. Until
+\cref{sec:count} the outcome is arbitrary: the assembly works for every
+outcome, and only its cost depends on it.
 
 \begin{table}[h]
 \centering\small
@@ -1944,8 +1945,8 @@ they are made after the hierarchy and the anchors have been fixed.
 object & distribution & purpose\\
 \midrule
 own graph $O_Y\subseteq H_Y$ & each edge with probability $\frac12$ & clearing inside $Y$ (\cref{lem:clear})\\
-closing graphs $R_{Y,\ell,j}$, $j\in[M_\ell^2]$ & each edge with probability $\frac1{2\chi_r}$ & closing cherries in round $\ell$ (\cref{lem:cherry})\\
-donor graph $\Rdon_{Y,\ell}$ & each edge with probability $\frac1{2\chi_r}$ & donor edges in round $\ell$ (\cref{lem:quotient})\\
+closing reservoirs $R_{Y,\ell,j}$, $j\in[M_\ell^2]$ & each edge with probability $\frac1{2\chi_r}$ & closing cherries in round $\ell$ (\cref{lem:cherry})\\
+donor reservoir $\Rdon_{Y,\ell}$ & each edge with probability $\frac1{2\chi_r}$ & donor edges in round $\ell$ (\cref{lem:quotient})\\
 slot sets $T_{Y,\ell,j}\subseteq Y$ & each vertex with probability $M_\ell^{-4}$ & interiors of cherry connectors\\
 pools $W_{\ell,r,\pm}\subseteq V(G)$ & each vertex with probability $q_\ell2^{-(\ell-r)}$ & vertices of the quotient $Q_\ell$\\
 \bottomrule
@@ -1956,17 +1957,189 @@ which these choices fail.}
 \label{tab:random}
 \end{table}
 
-\paragraph{The random cost.} Let $\Eas_\ell=\bigcup_{X\in\cY_\ell}E_X$ be the
-set of edges assigned in round $\ell$. Every resident has fewer than $M_\ell$
-edges in $\Eas_\ell$, because its piece has at most $M_\ell$ vertices. For a hub
-$h$ of round $\ell$, let $c_\ell(h)$ be the number of anchors $Y$ such that some
-edge of $\Eas_\ell$ joins $h$ to a port with anchor $Y$. Let
+\subsection{Decomposing the rounds in reverse order}\label{sec:assembly}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  stage/.style={draw=black!70,line width=.5pt,rounded corners=2pt,fill=black!3,align=left,font=\footnotesize,inner sep=4pt,text width=6.1cm},
+  stepnote/.style={font=\footnotesize,align=left,text width=5.6cm,text=black},
+  costnote/.style={font=\footnotesize,align=left,text width=4.4cm,black!70},
+  node distance=3.5mm]
+  \node[stage] (s0) {$F_X=E_X\setminus\Used$ for every piece $X$ of round $\ell$:
+  the edges assigned to $X$ that later rounds have not borrowed};
+  \node[stage,below=13mm of s0] (s1) {$E'_X$: every edge has an end at a live
+  port};
+  \node[stage,below=13mm of s1] (s2) {$J_\ell$: at most one edge from each
+  vertex that is not a live port to the live ports of each anchor};
+  \node[stage,below=13mm of s2] (s3) {hub edges (hub to port) and links (port to
+  port, possibly through a fresh middle)};
+  \node[stage,fill=cRes!15,below=13mm of s3] (s4) {$Q_\ell$, decomposed by
+  induction};
+  \foreach \a/\b/\t/\c in {
+    s0/s1/{\textbf{Step 1.} Clear hubs, fresh vertices and lost ports (\cref{lem:clear})}/{$101$ per vertex cleared},
+    s1/s2/{\textbf{Step 2.} Close cherries through reservoirs (\cref{lem:cherry})}/{$\sum_Y(\kappa_{Y,\ell}/2+2M_\ell)+n/(2M_\ell)$},
+    s2/s3/{\textbf{Step 3.} Pay at lost, pool and deficient vertices; pair at fresh ones}/{edges at unlucky and pool vertices; one per fresh vertex},
+    s3/s4/{\textbf{Step 4.} Attach donors; quotient (\cref{lem:quotient})}/{$|\cH^\ell_\paid|+2f(Q_\ell)$}}{
+    \draw[arr] (\a.south) -- (\b.north) node[midway,right=1mm,stepnote] {\t};
+    \node[costnote,anchor=east] at ($(\a.south)!0.5!(\b.north)+(-3.4,0)$) {\c};
+  }
+\end{tikzpicture}
+\caption{One round of the assembly. Boxes show the edges that remain after each
+step. The text to the right of each arrow says what the step does, and the text
+to the left says what it costs.}
+\label{fig:pipeline}
+\end{figure}
+
+Fix any outcome of the random preparation. We process the rounds
+$\ell=R,R-1,\dots,1$ in this order, and keep a set $\Used$ of reservoir edges
+that the rounds processed so far have used. It is initially empty. Let
+$\Eas_\ell=\bigcup_{X\in\cY_\ell}E_X$ be the set of edges assigned in round
+$\ell$. A vertex that is not a hub of round $\ell$ has fewer than $M_\ell$ edges
+in $\Eas_\ell$, because all of them lie in its only piece, which has at most
+$M_\ell$ vertices. Round $\ell$ consists of the following four steps.
+
+\paragraph{Step 1: clear.} For every piece $X$ of round $\ell$, let
+$F_X=E_X\setminus\Used$, and let
+\[
+P_X=X\cap(\Hub_\ell\cup\Fresh_\ell\cup\Lost_\ell).
+\]
+Let $O_X$ be the own graph of $X$ if $X$ is good, and $O_X=H_X$ if $X$ is bad.
+Apply \cref{lem:clear} to $O=O_X$, $E=F_X$ and $P=P_X$, and let
+$E'_X=F_X\setminus(F_X[P_X]\cup O')$ be the set of edges of $F_X$ that remain.
+
+\emph{Legitimacy.} We need $O_X\subseteq F_X$, that is, no edge of $O_X$ has
+been used by a later round, so that the objects produced use only edges of
+$F_X$. Later rounds use only reservoir edges. If $X$ is good, $O_X$ consists of
+own-coloured edges. If $X$ is bad, every port anchored at $X$ is lost, so no
+cherry of class $X$ is ever closed and no donor set of $X$ is ever used; hence
+no edge of $X$ is in $\Used$. Moreover $O_X$ is an $(s_\ell/4)$-expander with
+$s_\ell/4\ge(3\lambda_\ell)^{40}\ge\log^{40}|X|$, and $|X|\ge m_\ell\ge N_0$.
+
+\emph{Outcome.} Every vertex of $X$ is a hub, a fresh vertex, a lost port or a
+live port, so every edge of $E'_X$ has an end at a live port. For $\ell\le2$
+there are no ports, so $P_X=X$, $E'_X=\varnothing$, and the round ends here.
+
+\emph{Cost.} At most $101|P_X|$ objects.
+
+\paragraph{Step 2: close cherries} ($\ell\ge3$). Let $E'=\bigcup_XE'_X$. Apply
+\cref{lem:cherry} to $E'$, with the live ports of round $\ell$ as ports,
+classified by their anchors, and with $\Delta=M_\ell$, $K=M_\ell^2$,
+$T_{Y,j}=T_{Y,\ell,j}$ and $R_{Y,j}=R_{Y,\ell,j}$. Add the reservoir edges used
+to $\Used$, and let $J_\ell$ be the leftover set.
+
+\emph{Legitimacy.} \ref{it:C1}: Let $u$ be a live port with anchor $Y$ of round
+$r$, and let $uy\in E'\subseteq E(G_\ell)$. By the separation
+property~\ref{it:H-sep}, $y\notin Y$. \ref{it:C2}: $u$ is not a hub, so it has
+fewer than $M_\ell$ edges in $\Eas_\ell$. \ref{it:C3}: The anchor $Y$ of a live
+port is good, so the closing reservoirs $R_{Y,\ell,j}$, which span $Y$, link
+through $T_{Y,\ell,j}$ by~\ref{it:G2}. The sets $T_{Y,\ell,j}$ are pairwise
+disjoint and avoid the live ports anchored at $Y$. The colours $(\ell,j)$ are
+used only in round $\ell$, so none of these edges is in $\Used$. \ref{it:C4}:
+The graphs $H_Y$ are pairwise edge-disjoint, and they are disjoint from
+$E'\subseteq\Eas_\ell$.
+
+\emph{Outcome.} $J_\ell$ has at most one edge between each vertex that is not a
+live port and the live ports of each anchor.
+
+\emph{Cost.} Every edge of $E'$ has a live port as an end, so $|E'|\le nM_\ell$.
+Since $\kappa_Y\le\kappa_{Y,\ell}$, the number of cycles is at most
+\[
+\sum_Y\Bigl(\frac{\kappa_{Y,\ell}}2+2M_\ell\Bigr)+\frac n{2M_\ell},
+\]
+where $Y$ runs over the $\nu_\ell$ pieces of rounds at most $\ell-2$.
+
+\paragraph{Step 3: pay and pair.} Some leftover edges cannot enter the
+quotient: edges at lost ports, which have no usable anchor; edges at deficient
+ports, which have too few donors; and edges at pool vertices, which are
+reserved as vertices of the quotient and must not also play another role. Pay
+for every edge of $J_\ell$ with an end in $\Lost_\ell\cup W_\ell\cup\Def_\ell$.
+Then, at every fresh vertex $x\notin W_\ell$, pair up the remaining edges of
+$J_\ell$ at $x$ into paths $u\,x\,v$, and pay for the leftover edge if their
+number is odd. Since the two edges at $x$ are distinct edges of a simple graph,
+$u\ne v$.
+
+\emph{Cost.} For a hub $h$ of round $\ell$, let $c_\ell(h)$ be the number of
+anchors $Y$ such that some edge of $\Eas_\ell$ joins $h$ to a port with anchor
+$Y$, and put
 \[
 \omega_\ell(v)=\begin{cases}c_\ell(v)&\text{if }v\in\Hub_\ell,\\
 M_\ell&\text{otherwise.}\end{cases}
 \]
-Let $\beta_r(w)$ be the number of pieces of round $r$ that contain $w$, and let
-$t_\ell=\lceil2\log M_\ell\rceil$. The \emph{random cost} is
+These weights depend only on the hierarchy, not on the random choices. A vertex
+that is not a hub has $J_\ell$-degree less than $M_\ell$. Every edge of
+$J_\ell$ at a hub $h$ ends at a live port, because every edge of $E'$ has a
+live-port end and hubs are not ports. So by the outcome of Step 2, $h$ has
+$J_\ell$-degree at most $c_\ell(h)$. Hence the number of edges paid for in this
+step is at most
+\begin{equation}\label{eq:step3}
+M_\ell\bigl(|\Lost_\ell|+|\Def_\ell|\bigr)+\sum_{v\in W_\ell}\omega_\ell(v)+|\Fresh_\ell|.
+\end{equation}
+
+\paragraph{Step 4: quotient.} For a vertex $w$ and a round $r$, let
+$\beta_r(w)$ be the number of pieces of round $r$ that contain $w$. Apply
+\cref{lem:quotient} with $\Gamma=G$, $\Delta=M_\ell$ and $g=g_\ell$. The hubs are
+$A=\Hub_\ell\setminus W_\ell$, the ports $\Pi$ are the live ports outside
+$W_\ell\cup\Def_\ell$, the middles are $I=\Fresh_\ell\setminus W_\ell$, the
+pools are $W^\pm=W_\ell^\pm$, and the donor sets are $D^\pm(u)$. The hub edges
+are the remaining edges of $J_\ell$ between $A$ and $\Pi$. The links are the
+remaining edges of $J_\ell$ inside $\Pi$, together with the paths formed in
+Step~3. Finally, $\beta(w)=\beta_{r(w)}(w)$. Pay for the edges of
+$\cH^\ell_\paid$, the set $\cH_\paid$ given by the lemma. Take a decomposition
+of $Q_\ell$ into $f(Q_\ell)$ objects, lift it, and add the donor edges used to
+$\Used$.
+
+\emph{Legitimacy.} The sets $A$, $\Pi$, $I$, $W^-$ and $W^+$ are pairwise
+disjoint, since hubs, ports and fresh vertices are different roles and the pools
+were removed from the first three. After Step 3, every edge of $J_\ell$ has a
+port in $\Pi$ as one end. Its other end is a hub in $A$, a port in $\Pi$, or a
+fresh vertex in $I$, because all other cases were paid for in Step~3. So the
+remaining edges are exactly the hub edges and the edges of links. Ports and
+middles are not hubs, so ports lie on fewer than $M_\ell$ hub edges and links,
+and middles on fewer than $M_\ell/2$ links. Each hub edge contains one edge of
+$\Eas_\ell$ at a port and each link contains two, so $|\cH|+|\cL|\le
+nM_\ell$. The donor sets have size at least $g_\ell\ge4M_\ell+4$, because the
+ports in $\Pi$ are not deficient, and the donor colour $\ell$ is used only in
+round $\ell$. For condition~\eqref{eq:beta}, let $au$ be a hub edge and
+$w\in D^\pm(u)$. Then the anchor of $u$ is a piece of round $r(w)$ that contains
+$w$. Distinct such ports $u$ have distinct anchors, because $J_\ell$ has at
+most one edge from $a$ to the live ports of each anchor. So there are at most
+$\beta_{r(w)}(w)$ of them.
+
+\emph{Cost.} At most $|\cH^\ell_\paid|+2f(Q_\ell)$ objects. With
+$t_\ell=\lceil2\log M_\ell\rceil$ and $|\cH|+|\cL|\le nM_\ell$, the lemma gives
+\begin{equation}\label{eq:Qsize}
+|\cH^\ell_\paid|+|V(Q_\ell)|\le|\Hub_\ell|+M_\ell^3\!\!\sum_{w\in W_\ell}\!\beta_{r(w)}(w)
++3M_\ell t_\ell|W_\ell|+30n\Bigl(\frac1{M_\ell^9}+\frac1{M_\ell}\Bigr).
+\end{equation}
+
+\begin{lemma}[Every edge is used exactly once]\label{lem:ledger}
+The long cycles, the single edges of $G_{R+1}$, and the objects produced in
+Steps 1--4 of all rounds form a decomposition of $E(G)$.
+\end{lemma}
+
+\begin{proof}
+By \cref{lem:hierarchy}, $E(G)$ is partitioned into the long cycles, the edges
+of $G_{R+1}$, and the sets $E_X$ for all pieces $X$. Fix a piece $X$ of round
+$\ell$. Every edge of $E_X$ in a reservoir colour is used by at most one object,
+namely in its target round $\ell'\ge\ell+2$, which is processed before round
+$\ell$; when this happens it is added to $\Used$. Every other edge of $E_X$, and
+every reservoir edge of $X$ that was not used, lies in $F_X$ when round $\ell$
+starts. Within round $\ell$, the edges of $F_X$ are used exactly once: Step 1
+uses $F_X[P_X]\cup O'$, and passes the rest, $E'_X$, to Step 2; Step 2 uses
+$E'\setminus J_\ell$ and passes $J_\ell$ on; Step 3 pays for some edges of
+$J_\ell$ and passes the rest on as hub edges and links; and Step 4 covers these
+exactly once by \cref{lem:quotient}. The other edges used in round $\ell$ are
+reservoir edges of earlier pieces, in colours $(\ell,j)$ and $\ell$; each of
+them is used at most once, by \cref{lem:cherry,lem:quotient}, and is then added
+to $\Used$, so it is not used again when its owner is processed.
+\end{proof}
+
+\subsection{Counting}\label{sec:count}
+
+\paragraph{The random cost.} The costs of Steps 1, 3 and 4 depend on the random
+outcome through the lost and deficient ports and the pools. We collect these
+terms in the \emph{random cost}
 \[
 \Omega=\sum_{\ell=3}^R\Bigl[\underbrace{(101+M_\ell)|\Lost_\ell|}_{\text{lost ports}}
 +\underbrace{\sum_{v\in W_\ell}\omega_\ell(v)}_{\text{pool vertices}}
@@ -1978,12 +2151,13 @@ edges (Step 3). The second and third pay for the edges at pool vertices and at
 deficient ports (Step 3). The last two bound the size of the quotient
 (Step 4).
 
-The weights $\omega_\ell$ deserve a comment. In Step 3 we pay for the leftover
-edges at pool vertices. The leftover graph is produced by Step 2, which runs
-after the pools are fixed, so its degrees at pool vertices are not independent
-of the pools. But these degrees are bounded by the deterministic weights
-$\omega_\ell$ (see Step 3), and a sum of deterministic weights over a random set
-is easy to control.
+The weights $\omega_\ell$ in the second term are what make it easy to
+estimate. The edges paid for at a pool vertex are edges of $J_\ell$, and
+$J_\ell$ depends on the random choices, including the pools of later rounds
+through the set $\Used$. So the degrees of $J_\ell$ at pool vertices are not
+independent of the pools. But they are bounded by the weights $\omega_\ell$,
+which depend only on the hierarchy, and a sum of fixed weights over a random
+set is easy to control.
 
 \begin{lemma}\label{lem:Omega}
 $\E\Omega=\oD$.
@@ -2009,150 +2183,14 @@ $\E\Omega\le\sum_\ell10n/M_\ell\le20n/D^2$ by
 \cref{lem:scales}\ref{it:sc-halve}.
 \end{proof}
 
-We fix an outcome of all the random choices with $\Omega\le\E\Omega$. From now
-on everything is deterministic. All that the rest of the proof uses about this
-outcome is the definitions of good, live and deficient, and the bound
-$\Omega=\oD$.
-
-\subsection{Decomposing the rounds in reverse order}\label{sec:assembly}
-
-We process the rounds $\ell=R,R-1,\dots,1$ in this order, and keep a set
-$\Used$ of lent edges that the rounds processed so far have used. It is
-initially empty. Round $\ell$ consists of the following four steps.
-
-\paragraph{Step 1: clear.} For every piece $X$ of round $\ell$, let
-$F_X=E_X\setminus\Used$, and let
-\[
-P_X=X\cap(\Hub_\ell\cup\Fresh_\ell\cup\Lost_\ell).
-\]
-Let $O_X$ be the own graph of $X$ if $X$ is good, and $O_X=H_X$ if $X$ is bad.
-Apply \cref{lem:clear} to $O=O_X$, $E=F_X$ and $P=P_X$, and let
-$E'_X=F_X\setminus(F_X[P_X]\cup O')$ be the set of edges of $F_X$ that remain.
-
-\emph{Legitimacy.} We need $O_X\subseteq F_X$, that is, no edge of $O_X$ has
-been used by a later round. Later rounds use only lent colours. If $X$ is good,
-$O_X$ consists of own-coloured edges. If $X$ is bad, every port anchored at $X$
-is lost, so no cherry of class $X$ is ever closed and no donor set of $X$ is
-ever used; hence no edge of $X$ is in $\Used$. Moreover $O_X$ is an
-$(s_\ell/4)$-expander with $s_\ell/4\ge(3\lambda_\ell)^{40}\ge\log^{40}|X|$, and
-$|X|\ge m_\ell\ge N_0$.
-
-\emph{Outcome.} Every vertex of $X$ is a hub, a fresh vertex, a lost port or a
-live port, so every edge of $E'_X$ has an end at a live port. For $\ell\le2$
-there are no ports, so $P_X=X$, $E'_X=\varnothing$, and the round ends here.
-
-\emph{Cost.} At most $101|P_X|$ objects.
-
-\paragraph{Step 2: close cherries} ($\ell\ge3$). Let $E'=\bigcup_XE'_X$. Apply
-\cref{lem:cherry} to $E'$, with the live ports of round $\ell$ as ports,
-classified by their anchors, and with $\Delta=M_\ell$, $K=M_\ell^2$,
-$T_{Y,j}=T_{Y,\ell,j}$ and $R_{Y,j}=R_{Y,\ell,j}$. Add the lent edges used to
-$\Used$, and let $J_\ell$ be the leftover set.
-
-\emph{Legitimacy.} \ref{it:C1}: Let $u$ be a live port with anchor $Y$ of round
-$r$, and let $uy\in E'\subseteq E(G_\ell)$. By the separation
-property~\ref{it:H-sep}, $y\notin Y$. \ref{it:C2}: $u$ has fewer than $M_\ell$
-edges in $E_X$. \ref{it:C3}: The anchor $Y$ of a live port is good, so the
-graphs $R_{Y,\ell,j}$, which span $Y$, link through $T_{Y,\ell,j}$
-by~\ref{it:G2}. The sets $T_{Y,\ell,j}$ are pairwise disjoint and avoid the live
-ports anchored at $Y$. The colours $(\ell,j)$ are used only in round $\ell$, so
-none of these edges is in $\Used$. \ref{it:C4}: The graphs $H_Y$ are pairwise
-edge-disjoint, and they are disjoint from $E'\subseteq\Eas_\ell$.
-
-\emph{Outcome.} $J_\ell$ has at most one edge between each vertex that is not a
-live port and the live ports of each anchor.
-
-\emph{Cost.} Every edge of $E'$ has a live port as an end, and every port has
-fewer than $M_\ell$ edges in $\Eas_\ell$, so $|E'|\le nM_\ell$. Since
-$\kappa_Y\le\kappa_{Y,\ell}$ and at most $\nu_\ell$ anchors occur, the number of
-cycles is at most
-\[
-\sum_Y\Bigl(\frac{\kappa_{Y,\ell}}2+2M_\ell\Bigr)+\frac n{2M_\ell},
-\]
-where $Y$ runs over the pieces of rounds at most $\ell-2$.
-
-\paragraph{Step 3: pay.} Some leftover edges cannot enter the quotient: edges
-at lost ports, which have no usable anchor; edges at deficient ports, which have
-too few donors; and edges at pool vertices, which are reserved as vertices of
-the quotient and must not also play another role. Pay for every edge of
-$J_\ell$ with an end in $\Lost_\ell\cup W_\ell\cup\Def_\ell$. Then, at every fresh vertex $x\notin
-W_\ell$, pair up the remaining edges of $J_\ell$ at $x$ into links $u\,x\,v$,
-and pay for the leftover edge if their number is odd. Since $J_\ell$ is simple,
-$u\ne v$.
-
-\emph{Cost.} All edges of $J_\ell$ lie in $\Eas_\ell$, so a vertex that is not a
-hub has $J_\ell$-degree less than $M_\ell$. Every edge of $J_\ell$ at a hub $h$
-ends at a live port, because every edge of $E'$ has a live-port end and hubs are
-not ports. So by the outcome of Step 2, $h$ has $J_\ell$-degree at most
-$c_\ell(h)$. Hence, whatever $J_\ell$ is, the edges paid for at pool vertices
-number at most $\sum_{v\in W_\ell}\omega_\ell(v)$, and those paid for at lost and
-deficient ports number at most $M_\ell(|\Lost_\ell|+|\Def_\ell|)$. At most one
-edge is paid for at each fresh vertex.
-
-\paragraph{Step 4: quotient.} Apply \cref{lem:quotient} with $\Gamma=G$,
-$\Delta=M_\ell$ and $g=g_\ell$. The hubs are $A=\Hub_\ell\setminus W_\ell$, the
-ports $\Pi$ are the live ports outside $W_\ell\cup\Def_\ell$, the middles are
-$I=\Fresh_\ell\setminus W_\ell$, the pools are $W^\pm=W_\ell^\pm$, and the donor
-sets are $D^\pm(u)$. The hub edges are the remaining edges of $J_\ell$ between
-$A$ and $\Pi$. The links are the remaining edges of $J_\ell$ inside $\Pi$,
-together with the paths formed in Step~3. Finally,
-$\beta(w)=\beta_{r(w)}(w)$. Pay for the edges of $\cH_\paid$. Take a
-decomposition of $Q_\ell$ into $f(Q_\ell)$ objects, lift it, and add the donor
-edges used to $\Used$.
-
-\emph{Legitimacy.} The sets $A$, $\Pi$, $I$, $W^-$ and $W^+$ are pairwise
-disjoint, since hubs, ports and fresh vertices are different roles and the pools
-were removed from the first three. After Step 3, every edge of $J_\ell$ has a
-port in $\Pi$ as one end. Its other end is a hub in $A$, a port in $\Pi$, or a
-fresh vertex in $I$, because all other cases were paid for in Step~3. So the
-remaining edges are exactly the hub edges and the edges of links. Ports lie on
-fewer than $M_\ell$ of these, middles on fewer than $M_\ell/2$ links, and there
-are at most $nM_\ell$ of each kind. The donor sets have size at least
-$g_\ell\ge4M_\ell+4$, because the ports in $\Pi$ are not deficient, and the
-donor colour $\ell$ is used only in round $\ell$. For
-condition~\eqref{eq:beta}, let $au$ be a hub edge and $w\in D^\pm(u)$. Then the
-anchor of $u$ is a piece of round $r(w)$ that contains $w$. Distinct such
-ports $u$ have distinct anchors, because $J_\ell$ has at most one edge from $a$
-to the live ports of each anchor. So there are at most $\beta_{r(w)}(w)$ of
-them.
-
-\emph{Cost.} At most $|\cH^\ell_\paid|+2f(Q_\ell)$ objects, where
-\begin{equation}\label{eq:Qsize}
-|\cH^\ell_\paid|+|V(Q_\ell)|\le|\Hub_\ell|+M_\ell^3\!\!\sum_{w\in W_\ell}\!\beta_{r(w)}(w)
-+3M_\ell t_\ell|W_\ell|+30n\Bigl(\frac1{M_\ell^9}+\frac1{M_\ell}\Bigr).
-\end{equation}
-
-\begin{lemma}[Every edge is used exactly once]\label{lem:ledger}
-The long cycles, the single edges of $G_{R+1}$, and the objects produced in
-Steps 1--4 of all rounds form a decomposition of $E(G)$.
-\end{lemma}
-
-\begin{proof}
-By \cref{lem:hierarchy}, $E(G)$ is partitioned into the long cycles, the edges
-of $G_{R+1}$, and the sets $E_X$ for all pieces $X$. Fix a piece $X$ of round
-$\ell$. Every edge of $E_X$ in a lent colour is used by at most one object,
-namely in its target round $\ell'\ge\ell+2$, which is processed before round
-$\ell$; when this happens it is added to $\Used$. Every other edge of $E_X$, and
-every lent edge of $X$ that was not used, lies in $F_X$ when round $\ell$
-starts. Within round $\ell$, the edges of $F_X$ are used exactly once: Step 1
-uses $F_X[P_X]\cup O'$, and passes the rest, $E'_X$, to Step 2; Step 2 uses
-$E'\setminus J_\ell$ and passes $J_\ell$ on; Step 3 pays for some edges of
-$J_\ell$ and passes the rest on as hub edges and links; and Step 4 covers these
-exactly once by \cref{lem:quotient}. The other edges used in round $\ell$ are
-lent edges of earlier pieces, in colours $(\ell,j)$ and $\ell$; each of them is
-used at most once, by \cref{lem:cherry,lem:quotient}, and is then added to
-$\Used$, so it is not used again when its owner is processed.
-\end{proof}
-
-\subsection{Counting}\label{sec:count}
-
-\Cref{tab:costs} lists all objects produced. Clearing costs at most
-$101\sum_\ell\sum_X|P_X|$, and
+We now fix an outcome of the random preparation with $\Omega\le\E\Omega$, and
+carry out the assembly of \cref{sec:assembly} for it. \Cref{tab:costs} lists
+all objects produced. Clearing costs at most $101\sum_\ell\sum_X|P_X|$, and
 \[
 \sum_X|P_X|\le\sum_X|X\cap\Hub_\ell|+|\Fresh_\ell|+|\Lost_\ell|,
 \]
-since fresh and lost vertices are residents. The other entries follow from the
-costs of Steps~2--4, \cref{lem:bookkeeping}, $\Omega=\oD$ and
+since fresh and lost vertices lie in only one piece. The other entries follow
+from the costs of Steps~2--4, \cref{lem:bookkeeping}, $\Omega=\oD$ and
 \cref{lem:scales}\ref{it:sc-sum}.
 
 \begin{table}[h]
@@ -2166,16 +2204,17 @@ long cycles $\cC_r$ & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-cyc}\\
 single edges of $G_{R+1}$ & $<Dn/2$ & \cref{lem:hierarchy}\\
 clearing hubs & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-hub}\\
 clearing fresh vertices & $\le202n$ & \cref{lem:bookkeeping}\ref{it:bk-fresh}\\
-clearing lost ports; paying at lost, pool and deficient vertices & first three terms of $\Omega$ & Steps 1 and 3\\
+clearing lost ports; paying at lost, pool and deficient vertices & $\le\Omega=\oD$ & Steps 1 and 3, \cref{lem:Omega}\\
 cherry cycles & $\oD$ & \cref{lem:bookkeeping}\ref{it:bk-crowd},\ref{it:bk-anc} and \cref{lem:scales}\ref{it:sc-sum}\\
 unpaired edges at fresh vertices & $\le2n$ & \cref{lem:bookkeeping}\ref{it:bk-fresh}\\
 paid hub edges in the quotients & $\oD$ & \eqref{eq:Qsize}, see below\\
 lifted decompositions & $\le2\sum_\ell f(Q_\ell)$ & \cref{lem:quotient}\\
 \bottomrule
 \end{tabular}
-\caption{The cost of the decomposition. Only fresh vertices, at most twice
-each, and the final sparse graph cost $\Theta(n)$. Everything charged to rounds
-is summable.}
+\caption{The cost of the decomposition. Only the final sparse graph, the fresh
+vertices (at most twice each) and the lifted quotients cost $\Theta(n)$, and
+the quotients have only $\oD$ vertices in total. Everything else is summable
+over the rounds.}
 \label{tab:costs}
 \end{table}
 
@@ -2187,17 +2226,54 @@ $\Omega$, and the last is $\oD$ by \cref{lem:scales}\ref{it:sc-sum}. So
 \end{equation}
 
 \begin{proof}[Proof of \cref{thm:reduction}]
-Choose $D$ so large that all requirements above hold and that the left side
-of~\eqref{eq:Qtotal}, together with all entries $\oD$ of \cref{tab:costs}, is at
-most $n/4$. By \cref{lem:ledger} the objects produced form a decomposition of
-$E(G)$, so $\sum_\ell|V(Q_\ell)|\le n/4$ and
+Choose $D$ so large that all requirements in \cref{tab:requirements} hold,
+that $m_R\ge N_0$ for the constant $N_0$ of \cref{lem:clear}, and that the left
+side of~\eqref{eq:Qtotal}, together with all entries $\oD$ of
+\cref{tab:costs}, is at most $n/4$. These conditions involve only the constant
+$C_*$ of \cref{lem:link}, the constant $N_0$, and the absolute constants in
+\cref{tab:requirements}, so $D$ is an absolute constant. By \cref{lem:ledger}
+the objects produced form a decomposition of $E(G)$, so
+$\sum_\ell|V(Q_\ell)|\le n/4$ and
 \[
 f(G)\le\Bigl(\frac D2+202+2+\frac14\Bigr)n+2\sum_\ell f(Q_\ell).
 \]
-So \cref{thm:reduction} holds with $C_0=D/2+205$. The constant $D$, and hence
-$C_0$, is absolute, because every requirement on $D$ involves only absolute
-constants.
+So \cref{thm:reduction} holds with $C_0=D/2+205$.
 \end{proof}
+
+\subsection{The choice of exponents}\label{sec:exponents}
+
+The exponents in $s=\lceil\lambda^{50}\rceil$, $\tau=\lceil\lambda^{53}\rceil$
+and $m=\lceil\lambda^{54}\rceil$ are not optimised. \Cref{tab:requirements}
+collects everything the proof needs from them. In short: the pieces must be
+robust enough to lend edges to later rounds and to clear vertices ($s$ large);
+the cut threshold must be large enough for the splitting step but negligible
+compared with the order of the pieces ($s\log^2M\ll\tau\ll m$); and the next
+degree, about $s\lambda+m$, must still be polylogarithmic in $d$.
+
+\begin{table}[h]
+\centering\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}p{0.46\textwidth}p{0.46\textwidth}@{}}
+\toprule
+requirement & where it is used\\
+\midrule
+$\tau_r\ge256s_r\log^2M_r$ & splitting steps of round $r$ are legal (\cref{lem:split})\\
+$60\lambda_r^{51}+\frac43m_r\le\lambda_r^{55}$ & the next degree is $d_{r+1}\le\lambda_r^{55}$, see~\ref{it:H-degree}\\
+$\frac43\tau_r/m_r\le2/\lambda_r$ and $\log m_r\ge54\mu_r$ & hubs and crowding are summable over rounds (\cref{lem:bookkeeping})\\
+$m_r\ge3\lambda_rM_\ell$ & anchors are few (\cref{lem:bookkeeping}\ref{it:bk-anc}), and bad anchors are rare compared with slots (\cref{lem:Omega})\\
+$s_r/4\ge(3\lambda_r)^{40}$ & a piece can clear vertices with its own edges (\cref{lem:clear})\\
+$3(55\mu_r)^{222}\le\lambda_r^4/2$ & there are few reservoirs, $\chi_r\le\lambda_r^4/2$ (\cref{sec:random})\\
+$s_r/2\ge100\log M_r$, $m_r\ge\lambda_r^{40}$ and $\lambda_r^{46}/2\ge C_*M_\ell^{13}(3\lambda_r)^{18}$ & own graphs are expanders, and reservoirs link through sparse slots (\cref{lem:good})\\
+$\lambda_r^{45}\ge4M_\ell^{15}$ & donor sets are large (\cref{lem:deficient})\\
+\bottomrule
+\end{tabular}
+\caption{What the proof needs from the exponents, for all rounds $r$ and
+$\ell\ge r+2$. By \cref{lem:scales}, $M_\ell\le(55\mu_r)^{111}$, and
+$\log M_r\le2\lambda_r+1$. All requirements hold if $D$ is large, those
+involving $M_\ell$ because $\lambda_r=2^{\mu_r}$ is exponentially larger than
+any fixed power of $\mu_r$.}
+\label{tab:requirements}
+\end{table}
 
 % =====================================================================
 \section{Sources}\label{sec:sources}
@@ -2258,8 +2334,54 @@ proof of \cref{lem:link}; and smaller, explicitly motivated parameters
 \section{Proof of the linking lemma}\label{app:linking}
 % =====================================================================
 
-This appendix proves \cref{lem:link}. Let $H$, $s$, $t$, $\rho$ and $V$ be as
-in the lemma. Write $L=\log N$ and $\alpha=\eps/L^2$. Since
+This appendix proves \cref{lem:link}, following the outline given after its
+statement in \cref{sec:linking}.
+
+\subsection*{Two tools}
+
+We use two further tools. The first is Haxell's condition for disjoint
+representatives, which turns one-path-at-a-time statements into
+many-paths-at-once statements.
+
+\begin{theorem}[Haxell~\cite{Hax}]\label{thm:haxell}
+Let $h\ge1$ and let $\cA_1,\dots,\cA_q$ be families of sets of size at most $h$.
+Suppose that for every nonempty $I\subseteq[q]$ and every set $S$ with
+$|S|\le(2h-1)(|I|-1)$, some member of some $\cA_i$ with $i\in I$ is disjoint
+from $S$. Then there are pairwise disjoint sets $A_1\in\cA_1,\dots,A_q\in\cA_q$.
+\end{theorem}
+
+In Haxell's formulation, the families form a bipartite hypergraph in which each
+edge consists of one index $i$ together with a member of $\cA_i$, so edges have
+at most $r=h+1$ vertices, and the bound $(2r-3)(|I|-1)$ on transversals is the
+bound above.
+
+We also need a Bernstein-type inequality for functions of independent bits.
+It follows by applying Freedman's martingale inequality~\cite{Fre} to the
+exposure martingale; see also~\cite{McD}.
+
+\begin{lemma}[Bernstein inequality for bounded differences]\label{lem:freedman}
+Let $\xi_1,\dots,\xi_k$ be independent $\{0,1\}$-valued random variables with
+$\Pr(\xi_i=1)=p_i$, and let $Z=\phi(\xi_1,\dots,\xi_k)$, where changing $\xi_i$
+alone changes $\phi$ by at most $c_i\le c$. Put
+$\sigma^2=\sum_ip_i(1-p_i)c_i^2$. Then for all $x>0$,
+\[
+\Pr(Z\le\E Z-x)\le\exp\Bigl(-\frac{x^2}{2(\sigma^2+cx/3)}\Bigr).
+\]
+\end{lemma}
+
+\begin{proof}
+Let $Z_i=\E[Z\mid\xi_1,\dots,\xi_i]$. Given $\xi_1,\dots,\xi_{i-1}$, let
+$g(y)=\E[Z\mid\xi_1,\dots,\xi_{i-1},\xi_i=y]$. By independence $g(1)-g(0)$ is
+an average of differences of $\phi$, so $|g(1)-g(0)|\le c_i$. Hence the
+martingale difference $Z_i-Z_{i-1}=g(\xi_i)-\E g(\xi_i)$ is bounded by $c$ in
+absolute value and has conditional variance
+$p_i(1-p_i)(g(1)-g(0))^2\le p_i(1-p_i)c_i^2$. Freedman's inequality~\cite{Fre},
+applied to the martingale $-Z_i$, now gives the bound.
+\end{proof}
+
+\subsection*{Setup}
+
+Let $H$, $s$, $t$, $\rho$ and $V$ be as in \cref{lem:link}. Write $L=\log N$ and $\alpha=\eps/L^2$. Since
 $N>s\ge C_*L^{18}$, the order $N$ is as large as we like if $C_*$ is large.
 
 For a graph $H'$ on $V(H)$, a set $U$, a set $F$ of edges and an integer
@@ -2269,16 +2391,16 @@ Paths of length $0$ are allowed, so $U\cap V\subseteq\cB^k_{H'-F}(U)$. We use
 the parameters
 \[
 k=\Bigl\lceil\frac{100L}\alpha\Bigr\rceil,\quad p=\frac\rho{10k},\quad
-\theta=\frac{C_1L}{\alpha p},\quad \mu_0=\frac\alpha{6\theta},\quad
+\theta=\frac{C_1L}{\alpha p},\quad \zeta=\frac\alpha{6\theta},\quad
 h=\lceil4kL\rceil,\quad \bar s=\frac{40ht}\rho,\quad
-K=\Bigl\lceil\frac{\bar s}{\mu_0}\Bigr\rceil,
+K=\Bigl\lceil\frac{\bar s}{\zeta}\Bigr\rceil,
 \]
 where $C_1$ is a large absolute constant. Here $k$ is the radius of the balls,
 $p$ the density of one batch of $V$, $\theta$ the expansion of well-expanding
-sets, $\mu_0|U|$ the number of deleted edges that one colour class tolerates,
+sets, $\zeta|U|$ the number of deleted edges that one colour class tolerates,
 $h$ the length of the paths, $\bar s|U|$ the number of deleted edges needed for
 Haxell's theorem, and $K$ the number of colours. Then $k=O(L^3)$,
-$\theta=O(L^6/\rho)$, $\mu_0^{-1}=O(L^8/\rho)$, $h=O(L^4)$ and
+$\theta=O(L^6/\rho)$, $\zeta^{-1}=O(L^8/\rho)$, $h=O(L^4)$ and
 $K=O(tL^{12}\rho^{-2})$. So $2K(\theta+1)=O(tL^{18}\rho^{-3})\le s$ if $C_*$
 is large.
 
@@ -2348,19 +2470,19 @@ of~\cite[Proposition~13]{BM}.
 
 \begin{aclaim}[A growth certificate]\label{cl:certificate}
 Let $1\le|W|\le2N/3$, $F\subseteq E(H')$ with $|F|\le s'|W|/4$, and let $b$ be
-an integer with $1\le b\le s'$. Let $\Gamma$ be a maximal set of edges of
+an integer with $1\le b\le s'$. Let $\Phi$ be a maximal set of edges of
 $H'-F$ between $W$ and $V(H)\setminus W$ in which every vertex has degree at
-most $b$. Then $|\Gamma|\ge\alpha b|W|/4$.
+most $b$. Then $|\Phi|\ge\alpha b|W|/4$.
 \end{aclaim}
 
 \begin{proof}
-Suppose not. Then the sets $S\subseteq W$ and $X\subseteq V(H)\setminus W$ of
-vertices of $\Gamma$-degree exactly $b$ each have fewer than $\alpha|W|/4$
-elements. Let $U=W\setminus S$. By maximality, every edge of $H'-F-\Gamma$ from
-$U$ to $V(H)\setminus W$ ends in $X$. So $\NN_{H'-F-\Gamma}(U)\subseteq S\cup X$,
+Suppose not. Then the sets $W_b\subseteq W$ and $X_b\subseteq V(H)\setminus W$ of
+vertices of $\Phi$-degree exactly $b$ each have fewer than $\alpha|W|/4$
+elements. Let $U=W\setminus W_b$. By maximality, every edge of $H'-F-\Phi$ from
+$U$ to $V(H)\setminus W$ ends in $X_b$. So $\NN_{H'-F-\Phi}(U)\subseteq W_b\cup X_b$,
 a set of fewer than $\alpha|W|/2$ vertices. But $|U|\ge3|W|/4$ and
-$|F\cup\Gamma|\le s'|W|/4+\alpha b|W|/4\le s'|W|/2\le s'|U|$. So expansion
-gives $|\NN_{H'-F-\Gamma}(U)|\ge\alpha|U|\ge3\alpha|W|/4$, which is a
+$|F\cup\Phi|\le s'|W|/4+\alpha b|W|/4\le s'|W|/2\le s'|U|$. So expansion
+gives $|\NN_{H'-F-\Phi}(U)|\ge\alpha|U|\ge3\alpha|W|/4$, which is a
 contradiction.
 \end{proof}
 
@@ -2372,12 +2494,12 @@ vertices outside $W$ have an $(H'-F)$-neighbour in $S$.
 \end{aclaim}
 
 \begin{proof}
-Let $Z$ be the number of vertices outside $W$ with a $\Gamma$-neighbour in $S$. A
-vertex of $\Gamma$-degree $i\ge1$ is counted with probability
+Let $Z$ be the number of vertices outside $W$ with a $\Phi$-neighbour in $S$. A
+vertex of $\Phi$-degree $i\ge1$ is counted with probability
 $1-(1-p)^i\ge pi/2$, since $pi\le pb\le1+p\le3/2$. So
-$\E Z\ge p|\Gamma|/2\ge\alpha|W|/8$. Changing whether $w\in W$ lies in $S$
-changes $Z$ by at most $\deg_\Gamma(w)\le b$, and
-$\sigma^2=\sum_wp(1-p)\deg_\Gamma(w)^2\le pb|\Gamma|\le2b\E Z$. By
+$\E Z\ge p|\Phi|/2\ge\alpha|W|/8$. Changing whether $w\in W$ lies in $S$
+changes $Z$ by at most $\deg_\Phi(w)\le b$, and
+$\sigma^2=\sum_wp(1-p)\deg_\Phi(w)^2\le pb|\Phi|\le2b\E Z$. By
 \cref{lem:freedman} with $x=\E Z/2$ and $b\le2/p$,
 \[
 \Pr\bigl(Z<\tfrac12\E Z\bigr)\le\exp\Bigl(-\frac{3\E Z}{52b}\Bigr)
@@ -2418,7 +2540,7 @@ Here we used $N\ge\theta a$ and $\rho\theta\ge10^4C_1L$.
 
 \begin{aclaim}[Well-expanding subsets]\label{cl:wellexp}
 Every $U$ with $1\le|U|\le2N/3$ contains a well-expanding set $A$ with
-$|A|\ge\alpha|U|/(3\theta)=2\mu_0|U|$.
+$|A|\ge\alpha|U|/(3\theta)=2\zeta|U|$.
 \end{aclaim}
 
 \begin{proof}
@@ -2435,7 +2557,7 @@ $|\NN_{H'}(A)|<\theta(|A|+1)+1\le3\theta|A|$.
 
 \begin{aclaim}\label{cl:balls}
 With probability at least $1-2N^{-6}$, $|\cB^k_{H'-F}(U)|>0.56\rho N$ for every
-nonempty $U$ and every $F\subseteq E(H')$ with $|F|\le\mu_0|U|$.
+nonempty $U$ and every $F\subseteq E(H')$ with $|F|\le\zeta|U|$.
 \end{aclaim}
 
 \begin{proof}
@@ -2443,10 +2565,10 @@ Take a union bound of \cref{cl:sprinkle} over all pairs $(A,F)$ with $A$
 well-expanding, $|A|=a$ and $|F|\le a$. There are at most $N^{3a+1}$ such pairs
 for each $a$, so the failure probability is at most
 $\sum_aN^{1-7a}\le2N^{-6}$. If $|U|\le2N/3$, \cref{cl:wellexp} gives a
-well-expanding $A\subseteq U$ with $|A|\ge2\mu_0|U|\ge|F|$, and
+well-expanding $A\subseteq U$ with $|A|\ge2\zeta|U|\ge|F|$, and
 $\cB^k_{H'-F}(U)\supseteq\cB^k_{H'-F}(A)$. If $|U|>2N/3$, apply this to a subset
 $U'\subseteq U$ of size $\lceil N/2\rceil$, for which
-$|F|\le\mu_0N\le2\mu_0|U'|$.
+$|F|\le\zeta N\le2\zeta|U'|$.
 \end{proof}
 
 \subsection*{Amplification}
@@ -2463,7 +2585,7 @@ $s<N$. By \cref{lem:chernoff}, \cref{lem:sample} with $p=1/K$, and
 \cref{cl:balls}, all three events hold with probability at least
 $1-2e^{-\rho N/300}-KN^{-10}-2KN^{-6}\ge1-N^{-3}$, since $K<s<N$. Assume they
 hold. Let $U$ be nonempty and $|F|\le\bar s|U|$. Some colour $i$ has
-$|F\cap E(H_i)|\le\bar s|U|/K\le\mu_0|U|$, so
+$|F\cap E(H_i)|\le\bar s|U|/K\le\zeta|U|$, so
 \[
 |\cB^k_{H-F}(U)|\ge|\cB^k_{H_i-F}(U)|>0.56\rho N\ge|V|/2.
 \]
